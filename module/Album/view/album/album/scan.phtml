@@ -1,0 +1,62 @@
+<?php
+// module/Mp3/view/mp3/mp3/index.phtml:
+$title = 'Split mp3s';
+$this->headTitle($title);
+var_dump($audioArray);
+?>
+<h1><?php echo $this->escapeHtml($title); ?></h1>
+<div id="contentarea">
+	<div id="innercontentarea">
+		<div id = 'a1'>audio player</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	var id = 1;
+	var srcArray = <?php echo json_encode($this->audioArray); ?>;
+		for (i=0; i<srcArray.length-1; i++) {
+			src = "../audio/" + srcArray[i];
+			outputSound(i+1, src);
+		}
+
+	function  outputSound(id, src) {
+		var audioElement = document.createElement('audio');
+		var hr = document.createElement("hr");
+		var br = document.createElement("br");
+		var mydiv = document.createElement("div");
+		var nodeId=document.createTextNode('No '+id+' ');
+		mydiv.appendChild(hr);
+		mydiv.appendChild(nodeId);
+
+		mydiv.setAttribute('id', id);
+		mydiv.setAttribute('class', 'sound');
+		audioElement.setAttribute('src', src);
+		audioElement.setAttribute('controls', 'true');
+		document.body.appendChild(mydiv);
+
+		mydiv.appendChild(br);
+		mydiv.appendChild(hr);
+		mydiv.appendChild(nodeId);
+		mydiv.appendChild(br);
+		mydiv.appendChild(audioElement);
+		mydiv.appendChild(br);
+
+		var del = document.createElement("input");
+		del.type = "button";
+		del.value = "delete";
+		// e.setAttribute('onclick', merge());
+		// e.onclick=function(){alert('2222222222222222222'+tb+'111111111'+te);}
+		del.onclick=function delete() {
+			// alert('11111111111111111111111111');
+			var index = obj.indexOf(tb);
+			obj.splice(index, 1);
+			$('.sound').remove();
+			outputSound(obj);
+
+
+		};
+		// mydiv.style.textAlign = "center";
+		mydiv.style.marginLeft = '120px';
+	}
+
+</script>

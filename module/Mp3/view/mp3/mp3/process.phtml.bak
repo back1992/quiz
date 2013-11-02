@@ -1,0 +1,87 @@
+<?php
+// for ($i = 0; $i < count($this->mp3TagArrayTmp) - 1; $i++) {
+// 	echo '<audio src="'.$this->basePath() .'/data/audio/shandong.ogg#t=' . $this->mp3TagArrayTmp[$i] . ',' . $this->mp3TagArrayTmp[$i + 1] . '"  controls >';
+// 	echo 'audio is not supported.';
+// 	echo '</audio><br />';
+// 	echo $i+1 ;
+	// echo '<button name="button'.$i.'" type="button" onclick="alert(\'Hello world!\')">Buggy Whipp Bio</button> <br />';
+// }
+
+print_r($this->mp3TagArrayTmp);
+?>
+<div id = 'a1'>audio player</div>
+<script>
+	function  ca(id, src, tb, te) {
+		var audioElement = document.createElement('audio');
+		var hr = document.createElement("hr");
+		var br = document.createElement("br");
+		// var myid = document.createElement('id');
+		
+		// var mydiv = document.getElementById('a1');
+		var mydiv = document.createElement("div");
+		var nodeId=document.createTextNode('No '+id+'               ');
+		mydiv.appendChild(hr);
+		mydiv.appendChild(nodeId);
+		
+		mydiv.setAttribute('id', id);
+		mydiv.setAttribute('class', 'sound');
+		audioElement.setAttribute('src', src+'#t='+tb+','+te);
+		audioElement.setAttribute('controls', 'true');
+		// console.log(audioElement.duration);
+		// $(".duration span").html(audioElement.duration);
+		// $(".filename span").html(audioElement.src);
+		document.body.appendChild(mydiv);
+		
+		// mydiv.appendAfter(myid);
+		
+		mydiv.appendChild(br);
+		var nodeText=document.createTextNode('   Begin time = '+Number(tb).toFixed(2)+'   End time =  '+Number(te).toFixed(2));
+		mydiv.appendChild(hr);
+		mydiv.appendChild(nodeId);
+		mydiv.appendChild(nodeText);
+		mydiv.appendChild(br);
+		mydiv.appendChild(audioElement);
+		// mydiv.appendChild(br);
+
+		var e = document.createElement("input");
+		e.type = "button";
+		e.value = "merge";
+		// e.setAttribute('onclick', merge());
+		// e.onclick=function(){alert('2222222222222222222'+tb+'111111111'+te);}
+		// e.onclick=merge(te).closeThis();
+		mydiv.appendChild(e);
+		e.setAttribute('onclick', function () {
+			alert('11111111111111111111111111');
+			// var index = obj.indexOf(te);
+			// obj.splice(index, 1);
+			// $('.sound').remove();
+			// outputSound(obj);
+
+
+		};
+
+		// mydiv.style.textAlign = "center";
+		mydiv.style.marginLeft = '120px';
+	}
+
+	function merge() {
+		alert('11111111111111111111111111');
+			// var index = obj.indexOf(te);
+			// obj.splice(index, 1);
+			// $('.sound').remove();
+			// outputSound(obj);
+
+
+		};
+
+		function outputSound(obj) {
+			for (i=0; i<obj.length-1; i++) {
+				ca(i+1, src, obj[i], obj[i+1]);
+			}
+		}
+
+		var id = 1;
+		var src = '/data/audio/shandong.ogg';
+		var obj = <?php echo json_encode($this->mp3TagArrayTmp); ?>;
+		outputSound(obj);
+	</script>

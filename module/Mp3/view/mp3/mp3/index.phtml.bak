@@ -1,0 +1,79 @@
+<?php
+// module/Mp3/view/mp3/mp3/index.phtml:
+$title = 'My mp3s';
+$this->headTitle($title);
+?>
+<h1><?php echo $this->escapeHtml($title); ?></h1>
+<p>
+	<a href="<?php echo $this->url('mp3', array('action'=>'add'));?>">Add new mp3</a>
+</p>
+
+<table class="table">
+	<tr>
+		<th>Title</th>
+		<th>Area</th>
+		<th>Mp3file</th>
+		<th>&nbsp;</th>
+	</tr>
+	<?php foreach ($this->paginator as $mp3) : // <-- change here! ?>
+	<?php var_dump($mp3); ?>
+	<tr>
+		<td><?php echo $this->escapeHtml($mp3->title);?></td>
+		<td><?php echo $this->escapeHtml($mp3->area);?></td>
+		<td><?php echo $this->escapeHtml($mp3->mp3file);?></td>
+		<td>
+			<a href="<?php echo $this->url('mp3',
+			array('action' => 'edit', 'id' => $mp3->id));?>">Edit</a>
+<a href="<?php echo $this->url('mp3',
+array('action' => 'delete', 'id' => $mp3->id));?>">Delete</a>
+</td>
+</tr>
+<?php endforeach; ?>
+</table>
+<?php
+echo $this->paginationControl(
+// the paginator object
+	$this->paginator,
+// the scrolling style
+	'sliding',
+// the partial to use to render the control
+	array('partial/paginator.phtml', 'Mp3'),
+// the route to link to when a user clicks a control link
+	array(
+		'route' => 'mp3'
+		)
+	);
+?>
+
+
+
+
+<?php
+// module/mp3/view/mp3/mp3/index.phtml:
+$title = 'My mp3s';
+$this->headTitle($title);
+?>
+<h1><?php echo $this->escapeHtml($title); ?></h1>
+<p>
+<a href="<?php echo $this->url('mp3', array('action'=>'add'));?>">Add new mp3</a>
+</p>
+<table class="table">
+<tr>
+<th>Title</th>
+<th>Artist</th>
+<th>&nbsp;</th>
+</tr>
+<?php foreach ($mp3s as $mp3) : ?>
+<tr>
+		<td><?php echo $this->escapeHtml($mp3->title);?></td>
+		<td><?php echo $this->escapeHtml($mp3->area);?></td>
+		<td><?php echo $this->escapeHtml($mp3->mp3file);?></td>
+<td>
+<a href="<?php echo $this->url('mp3',
+array('action'=>'edit', 'id' => $mp3->id));?>">Edit</a>
+<a href="<?php echo $this->url('mp3',
+array('action'=>'delete', 'id' => $mp3->id));?>">Delete</a>
+</td>
+</tr>
+<?php endforeach; ?>
+</table>

@@ -1,0 +1,45 @@
+<?php
+// module/Mp3/view/mp3/mp3/edit.phtml:
+$title = 'Edit mp3';
+$this->headTitle($title);
+?>
+<h1><?php echo $this->escapeHtml($title); ?></h1>
+<?php
+$form = $this->form;
+$form->setAttribute('action', $this->url(
+	'album',
+	array(
+		'action' => 'fetchaudio',
+		'id'
+		=> $this->id,
+		)
+	));
+$form->prepare();
+echo $this->form()->openTag($form);
+echo $this->formHidden($form->get('id')).'<br />';
+echo $this->formRow($form->get('title')).'<br />';
+echo $this->formRow($form->get('area')).'<br />';
+echo $this->formRow($form->get('caption')).'<br />';
+// echo $this->formRow($form->get('audiofilepath')).'<br />';
+echo $this->formRow($form->get('audiofiledir')).'<br />';
+echo $this->formRow($form->get('audioname')).'<br />';
+// echo $this->formButton($form->get('mybutton')->setAttribute('onclick','window.location =\''.$this->url(
+// 	'album',
+// 	array(
+// 		'action' => 'splt',
+// 		'id' => $this->audiopath,
+// 		)
+// 	).'\'')).'<br />';
+// echo $this->formButton($form->get('mybutton'));
+	?>	
+	<?php
+// echo $this->escapeHtml($mp3->audiofilepath);
+	echo "<br />";
+	echo $this->formSubmit($form->get('submit'));
+	echo $this->form()->closeTag();
+	?>
+	<p>
+		<a href="<?php echo $this->url('album',  array('action' => 'mp3indb'));?>"> 
+			list Audio file in MongoDB?
+		</a>
+	</p>

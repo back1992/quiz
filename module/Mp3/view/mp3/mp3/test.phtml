@@ -1,0 +1,33 @@
+<?php
+// for ($i = 0; $i < count($this->mp3TagArrayTmp) - 1; $i++) {
+// 	echo '<audio src="'.$this->basePath() .'/data/audio/shandong.ogg#t=' . $this->mp3TagArrayTmp[$i] . ',' . $this->mp3TagArrayTmp[$i + 1] . '"  controls >';
+// 	echo 'audio is not supported.';
+// 	echo '</audio><br />';
+// 	echo $i+1 ;
+	// echo '<button name="button'.$i.'" type="button" onclick="alert(\'Hello world!\')">Buggy Whipp Bio</button> <br />';
+// }
+
+echo $this->basePath() .'/data/audio/shandong.ogg#t='
+?>
+<div id = 'a1'>audio player</div>
+<script>
+	function  ca(id, src, tb, te) {
+		var audioElement = document.createElement('audio');
+		var br = document.createElement("br");
+		var mydiv = document.getElementById('a1');
+		audioElement.setAttribute('id', id);
+		audioElement.setAttribute('src', src+'#t='+tb+','+te);
+		audioElement.setAttribute('controls', 'true');
+		// console.log(audioElement.duration);
+		// $(".duration span").html(audioElement.duration);
+		// $(".filename span").html(audioElement.src);
+		mydiv.appendChild(br);
+		mydiv.appendChild(audioElement);
+	}
+	var id = 1;
+	var src = '/data/audio/shandong.ogg';
+	// var src = './audio/meadow.ogg';
+	var tb = 100;
+	var te = 120;
+	ca(id, src, tb, te);
+</script>

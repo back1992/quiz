@@ -1,0 +1,99 @@
+<?php
+// module/Album/view/album/album/index.phtml:
+$title = 'Mp3 List';
+$this->headTitle($title);
+?>
+<h1><?php echo $this->escapeHtml($title); ?></h1>
+<div id="contentarea">
+	<div id="innercontentarea">
+		<h1>Uploaded Images</h1>
+		<audio src="<?php echo  $this->basePath('audio/shandong.ogg'); ?>" controls="controls">
+			Your browser does not support the audio element.
+		</audio>
+	</div>
+</div>
+
+<!-- <div id = 'a1'>audio player</div>
+<script>
+	function  ca(id, src, tb, te) {
+		var audioElement = document.createElement('audio');
+		var hr = document.createElement("hr");
+		var br = document.createElement("br");
+		var mydiv = document.createElement("div");
+		var nodeId=document.createTextNode('No '+id+'               ');
+		mydiv.appendChild(hr);
+		mydiv.appendChild(nodeId);
+
+		mydiv.setAttribute('id', id);
+		mydiv.setAttribute('class', 'sound');
+		audioElement.setAttribute('src', src+'#t='+tb+','+te);
+		audioElement.setAttribute('controls', 'true');
+		document.body.appendChild(mydiv);
+
+		mydiv.appendChild(br);
+		var nodeText=document.createTextNode('   Begin time = '+Number(tb).toFixed(2)+'   End time =  '+Number(te).toFixed(2));
+		mydiv.appendChild(hr);
+		mydiv.appendChild(nodeId);
+		mydiv.appendChild(nodeText);
+		mydiv.appendChild(br);
+		mydiv.appendChild(audioElement);
+		// mydiv.appendChild(br);
+
+		var del = document.createElement("input");
+		del.type = "button";
+		del.value = "delete";
+		// e.setAttribute('onclick', merge());
+		// e.onclick=function(){alert('2222222222222222222'+tb+'111111111'+te);}
+		del.onclick=function delete() {
+		// alert('11111111111111111111111111');
+		var index = obj.indexOf(tb);
+		obj.splice(index, 1);
+		$('.sound').remove();
+		outputSound(obj);
+
+
+	};
+	mydiv.appendChild(del);
+
+	var e = document.createElement("input");
+	e.type = "button";
+	e.value = "merge";
+		// e.setAttribute('onclick', merge());
+		// e.onclick=function(){alert('2222222222222222222'+tb+'111111111'+te);}
+		e.onclick=function merge() {
+		// alert('11111111111111111111111111');
+		var index = obj.indexOf(te);
+		obj.splice(index, 1);
+		$('.sound').remove();
+		outputSound(obj);
+
+
+	};
+	mydiv.appendChild(e);
+
+
+		// mydiv.style.textAlign = "center";
+		mydiv.style.marginLeft = '120px';
+	}
+
+	function merge() {
+		alert('11111111111111111111111111');
+			// var index = obj.indexOf(te);
+			// obj.splice(index, 1);
+			// $('.sound').remove();
+			// outputSound(obj);
+
+
+		};
+
+		function outputSound(obj) {
+			for (i=0; i<obj.length-1; i++) {
+				ca(i+1, src, obj[i], obj[i+1]);
+			}
+		}
+
+		var id = 1;
+		var src = 'http://quiz.local/mp3/shandong.ogg';
+		var obj = <?php echo json_encode($this->mp3TagArrayTmp); ?>;
+		outputSound(obj);
+	</script> -->
