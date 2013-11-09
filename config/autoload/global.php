@@ -33,6 +33,12 @@ return array(
 			array(
 				'label' => 'FFMpeg',
 				'route' => 'ffmpeg',
+				'pages' => array(
+					array(
+						'label' => 'List',
+						'route' => 'scan',
+						),
+					),
 				),
 			),
 		),

@@ -16,6 +16,7 @@
         "doctrine/doctrine-mongo-odm-module": "dev-master",
         "zf-commons/zfc-user": "dev-master",
         "bjyoungblood/bjy-profiler":"*",
-        "zendframework/zftool": "dev-master"
+        "zendframework/zftool": "dev-master",
+        "bootstrap-glyphicons": "*"
     }
 }

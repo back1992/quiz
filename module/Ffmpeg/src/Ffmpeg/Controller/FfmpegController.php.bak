@@ -1,0 +1,154 @@
+<?php
+
+namespace Ffmpeg\Controller;
+
+use Zend\Mvc\Controller\AbstractActionController;
+use Zend\View\Model\ViewModel;
+use Ffmpeg\Form\DirForm;
+use Zend\Stdlib\Hydrator;
+
+class FfmpegController extends AbstractActionController
+{
+
+	public function indexAction()
+	{
+		$dir = './public/audio';
+		// $audioArr = scandir($dir);
+		// array_splice($audioArr,  0, 3);   
+		// $hydrator = new Hydrator\ArraySerializable();
+
+
+		// $audioArr = $this->dirToArray($dir);
+		// $title = array_keys($audioArr);
+		// $title = array('title' => array_keys($audioArr));
+		// $title = array('title' => 'title123');
+
+
+		$form = new DirForm();
+		// $form->setData($title);
+		return array(
+			'form' => $form,
+			'title' => $title,
+			'dir' => $dir,
+			);
+	}
+
+	public function ajaxAction()
+	{
+		
+	}
+
+
+	public function convertAction()
+	{
+		// system('shell_exec('ffmpeg -i ./data/mp3/'. $audiofile . ' '.$path_parts['filename'].'.ogg');');
+		$request = $this->getRequest();
+		if ($request->isPost()) {
+			$sdir=$request->getPost();
+			var_dump($sdir);
+		}
+		return false;
+
+	}
+	public function foldertreeAction()
+	{
+		$base = $_SERVER['DOCUMENT_ROOT'];
+		if(isset($_REQUEST['dir'])){
+			$dir=urldecode($_REQUEST['dir']);
+		}else{
+			$dir='/';
+		}
+		if( file_exists($base.$dir) ) {
+			$files = scandir($base.$dir);
+			natcasesort($files);
+			if( count($files) > 2){ /* The 2 accounts for . and .. */
+		echo '<ul class="jqueryFolderTree" style="display: none;" >'; //style="display: none;"
+		// All dirs
+		foreach($files as $file){
+			if( file_exists($base.$dir.$file) && $file != '.' && $file != '..' && is_dir($base.$dir.$file)){
+				if($this->check_for_subdirs($base.$dir.$file)==true){
+					echo '<li><a href="#" class="collapsed" rel="'.$dir.$file.'/"></a><a href="'.$dir.$file.'/" class="folder">'.$file.'</a></li>';
+				}else{
+					echo '<li><a href="#"   class="nosubs"  rel="'.$dir.$file.'/"></a><a href="'.$dir.$file.'/"  class="folder">'.$file.'</a></li>';
+				}
+			}
+		}
+		echo '</ul>';	
+	}
+}
+return false;
+}
+
+
+public function ajaxphpAction()
+{
+	$_POST['dir'] = urldecode($_POST['dir']);
+	$root = './public';
+
+
+	if( file_exists($root . $_POST['dir']) ) {
+		$files = scandir($root . $_POST['dir']);
+		natcasesort($files);
+		if( count($files) > 2 ) { /* The 2 accounts for . and .. */
+			echo "<ul class=\"jqueryFileTree\" style=\"display: none;\">";
+		// All dirs
+			foreach( $files as $file ) {
+				if( file_exists($root . $_POST['dir'] . $file) && $file != '.' && $file != '..' && is_dir($root . $_POST['dir'] . $file) ) {
+					echo "<li class=\"directory collapsed\"><a href=\"#\" rel=\"" . htmlentities($_POST['dir'] . $file) . "/\">" . htmlentities($file) . "</a></li>";
+				}
+			}
+		// All files
+/*				foreach( $files as $file ) {
+					if( file_exists($root . $_POST['dir'] . $file) && $file != '.' && $file != '..' && !is_dir($root . $_POST['dir'] . $file) ) {
+						$ext = preg_replace('/^.*\./', '', $file);
+						echo "<li class=\"file ext_$ext\"><a href=\"#\" rel=\"" . htmlentities($_POST['dir'] . $file) . "\">" . htmlentities($file) . "</a></li>";
+					}
+				}*/
+				echo "</ul>";	
+			}
+		}
+
+		return false;
+	}
+
+
+
+	public function dirToArray($dir) { 
+
+		$result = array(); 
+
+		$cdir = scandir($dir); 
+		foreach ($cdir as $key => $value) 
+		{ 
+			if (!in_array($value,array(".",".."))) 
+			{ 
+				if (is_dir($dir . DIRECTORY_SEPARATOR . $value)) 
+				{ 
+					$result[$value] = $this->dirToArray($dir . DIRECTORY_SEPARATOR . $value); 
+				} 
+				else 
+				{ 
+					$result[] = $value; 
+				} 
+			} 
+		} 
+
+		return $result; 
+	} 
+
+	function check_for_subdirs($path){
+		$found = false;
+		$items = scandir($path);
+		foreach($items as $item){
+			if($item != '.' && $item != '..' && is_dir($path.'/'.$item) ){
+				$found=true;
+				break;
+			}else{
+				$found=false;
+			}
+		}
+		return $found;
+	}
+
+}
+

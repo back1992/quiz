@@ -1,0 +1,85 @@
+<?php
+// module/Album/view/album/album/index.phtml:
+$this->headLink()->appendStylesheet($this->basePath('./js/jqueryFileTree/jqueryFileTree.css'));
+$this->headLink()->appendStylesheet($this->basePath('./js/jquery_folder_tree/style.css'));
+$this->headScript()->appendFile($this->basePath('./js/jqueryFileTree/jqueryFileTree.js'),
+	'text/javascript');
+$this->headScript()->appendFile($this->basePath('./js/jquery_folder_tree/jquery.foldertree.js'), 'text/javascript');
+// adding styles
+// $styles = 'SPAN.directory { background: url(./js/jqueryFileTree/images/directory.png) left top no-repeat; }';
+
+
+$title = 'FFMpeg and Mp3splt';
+$this->headTitle($title);
+?>
+<h1><?php echo $this->escapeHtml($title); ?></h1>
+<p>
+	<?php 
+	// var_dump($this->audioArr); 
+	// echo $this->htmlList($this->audioArr); 
+	?>
+	<h4>Current Directory</h4>
+	<div id="smallbrowser"></div>
+	<?php 
+	$form->setAttribute('action', $this->url('ffmpeg', array('action' => 'convert')));
+	$form->prepare(); // The correct enctype is set here 
+	echo $this->form()->openTag($form); 
+	?>
+
+
+	<table class="table table-striped table-hover">
+		<thead>
+			<tr>
+				<th width="*">Check</th>
+				<th width="*">Dir</th>
+				<th width="*">Process</th>
+			</tr>
+		</thead>
+		<tbody>
+			<!-- <?php foreach ($this->audioArr as $key => $value) {  ?> -->
+			<tr>
+				<td>
+					<?php echo $this->formRow($form->get('title')); ?>
+				</td>
+				<td >
+					<img src="<?php echo $this->basePath('./js/jqueryFileTree/images/directory.png'); ?>">
+					<!-- <?php echo $key; ?> -->
+				</td>
+				<td >
+					<?php echo $this->formRow($form->get('process')); ?>
+				</td>
+			</tr>
+			<!-- <?php } ;?> -->
+		</tbody>
+	</table>
+
+	<?php 
+	echo $this->formSubmit($form->get('submit'));
+	echo $this->form()->closeTag(); 
+	?>
+
+	<script type="text/javascript">
+		$(document).ready(function(){
+			$("#smallbrowser").folderTree({
+				root: '/',
+				script: 'foldertree',
+				loadMessage: 'My loading message...'
+			}).click(function(event) { 
+				// var elementClicked = event.target;  
+				// alert(elementClicked); /
+				// var mybutton ='<?php echo $this->formRow($form->get('process')); ?>';
+				// var mybutton ='<input onclick="exec(\'ls\')" value="执行noteppad.exe" type="button"> ';
+				// var mybutton ="<button onclick=\"startprocess();\">Start</button> ";
+				// var mybutton ="<button onclick=\"startprocess();\">Start</button> ";
+				// console.log(mybutton);
+				// var newtr =  "<tr><td>1</td><td>"+elementClicked.pathname.slice(1, -1 ) +"</td><td>"+ mybutton +"</td></tr>"
+				// $("tbody").append(newtr);
+			});
+			$("body").css({
+				"color": "#666666",
+				"font-family": "Helvetica Neue ,Helvetica,Arial,sans-serif",
+				"font-size": "12px",
+				"line-height": "1.5"
+			});
+		});
+	</script>

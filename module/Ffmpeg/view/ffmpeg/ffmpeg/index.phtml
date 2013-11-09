@@ -1,8 +1,43 @@
 <?php
 // module/Album/view/album/album/index.phtml:
-$title = 'FFMpeg and Mp3splt';
+$this->headLink()->appendStylesheet($this->basePath('./js/jqueryFileTree/jqueryFileTree.css'));
+$this->headLink()->appendStylesheet($this->basePath('./js/jquery_folder_tree/style.css'));
+$this->headScript()->appendFile($this->basePath('./js/jqueryFileTree/jqueryFileTree.js'),
+	'text/javascript');
+$this->headScript()->appendFile($this->basePath('./js/jquery_folder_tree/jquery.foldertree.js'), 'text/javascript');
+
+$title = 'FFMpeg and Mp3splt  Scan';
 $this->headTitle($title);
 ?>
 <h1><?php echo $this->escapeHtml($title); ?></h1>
-<p>
 
+
+	<script type="text/javascript">
+		$(document).ready(function(){
+			$("#smallbrowser").folderTree({
+				root: '/',
+				script: 'foldertree',
+				loadMessage: 'My loading message...'
+			})
+			// .click(function(event) { 
+				// var elementClicked = event.target;  
+				// alert(elementClicked); /
+				// var mybutton ='<?php echo $this->formRow($form->get('process')); ?>';
+				// var mybutton ='<input onclick="exec(\'ls\')" value="执行noteppad.exe" type="button"> ';
+				// var mybutton ="<button onclick=\"startprocess();\">Start</button> ";
+				// var mybutton ="<button onclick=\"startprocess();\">Start</button> ";
+				// console.log(mybutton);
+				// var newtr =  "<tr><td>1</td><td>"+elementClicked.pathname.slice(1, -1 ) +"</td><td>"+ mybutton +"</td></tr>"
+				// $("tbody").append(newtr);
+			// });/**/
+			$("#smallbrowser").css({
+				"color": "#666666",
+				"font-family": "Helvetica Neue ,Helvetica,Arial,sans-serif",
+				"font-size": "12px",
+				"line-height": "1.5"
+			});
+			$('#container_id').fileTree({root: './public/'}, function(file) {
+				alert(file);
+			});
+		});
+</script>

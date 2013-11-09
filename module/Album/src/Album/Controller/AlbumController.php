@@ -239,7 +239,7 @@ public function readlogAction()
 
 public function scanAction()
 {
-    $audioDir = './data/audio';
+    $audioDir = './public/audio';
     $audioArray = scandir($audioDir);
      array_splice($audioArray,  0, 3);   
         return array(

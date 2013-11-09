@@ -13,7 +13,8 @@ return array(
         'Application',
         'Album',
         'Mp3',
-        'Ffmpeg'
+        'Ffmpeg',
+        'Audio'
         ),
     'module_listener_options' => array(
         'module_paths' => array(
