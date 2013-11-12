@@ -1,11 +1,6 @@
 <?php
 // module/Album/view/album/album/index.phtml:
 $this->headLink()->appendStylesheet($this->basePath('./js/phpFileTree/styles/default/default.css'));
-/*$this->headScript()->appendFile($this->basePath('./js/phpFileTree/php_file_tree_jquery.js'),
-	'text/javascript');*/
-/*$this->headScript()->appendFile($this->basePath('./js/phpFileTree/php_file_tree.js'),
-	'text/javascript');*/
-
 $title = 'FFMpeg and Mp3splt  Scan';
 $this->headTitle($title);
 ?>
@@ -26,12 +21,14 @@ $this->headTitle($title);
 	<div class="col-md-8">
 		<?php 
 		$form = $this->form;
-		$form->setAttribute('action', $this->url('ffmpeg', array('action' => 'convert')));$form->prepare();
+		// $form->setAttribute('action', $this->url('ffmpeg', array('action' => 'convert')));
+		$form->prepare();
 		echo $this->form()->openTag($form);
 		echo $this->formHidden($form->get('id'));
 		echo $this->formRow($form->get('title'));
 		// echo $this->formRow($form->get('artist'));
-		echo $this->formSubmit($form->get('submit'));
+		echo $this->formSubmit($form->get('submit')->setValue('Convert Mp3 to Ogg'));
+		echo $this->formSubmit($form->get('submit')->setValue('Split by Silence'));
 		echo $this->form()->closeTag();
 
 		?>

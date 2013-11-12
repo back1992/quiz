@@ -1,76 +1,179 @@
 <?php
-
 namespace Ffmpeg\Controller;
-
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 use Ffmpeg\Form\DirForm;
 use Zend\Stdlib\Hydrator;
-
+use Zend\Config\Config;
 class FfmpegController extends AbstractActionController
 {
-
 	public function indexAction()
 	{
 		$form = new DirForm();
+		// $data = array(
+		// 	'title'    => './public/audio',
+		// 	);
+		$reader = new \Zend\Config\Reader\Json();
+		$readdata   = $reader->fromFile('./config/autoload/config.json');
 		$data = array(
-			'title'    => './public/audio',
+			'title'    => $readdata['audiodata'],
 			);
-		$form->setData($data);
-		return array(
-			'form' => $form,
-			);
-	}
-	public function scanAction()
-	{
-		$dir = './public/';
 		$form = new DirForm();
-
+		$form->setData($data);
+		$dir = $readdata['audiodata'];
 		if( file_exists($dir) ) {
 			$files = $this->dirToArray($dir);
 			krsort($files);
 		}
+		$request = $this->getRequest();
+		if ($request->isPost()) {
+			// $sDir=$request->getPost()->title;
+			var_dump($request->getPost()->submit);
+			// var_dump($request);
+			$forwardPlugin = $this->forward();
+			switch ($request->getPost()->submit)
+			{
+				case 'Convert Mp3 to Ogg':
+				$returnValue = $forwardPlugin->dispatch('Ffmpeg\Controller\Ffmpeg', array(
+					'action' => 'convert'
+					));
+				break;  
+				case 'Split by Silence':
+				$returnValue = $forwardPlugin->dispatch('Ffmpeg\Controller\Ffmpeg', array(
+					'action' => 'splt'
+					));
+				// return $this->redirect()->toRoute('ffmpeg',  array('action' => 'splt'));
+				return $returnValue;
+				break;
+				case 'Fine Tune':
+				$returnValue = $forwardPlugin->dispatch('Ffmpeg\Controller\Ffmpeg', array(
+					'action' => 'fine'
+					));
+				// return $this->redirect()->toRoute('ffmpeg',  array('action' => 'splt'));
+				return $returnValue;
+				break;
+				default:
+				return false;
+			}
+		}
 		return array('files' => $files, 'dir' => $dir, 'form' => $form);
-	} 
+	}
 	public function convertAction()
 	{
 		// system('shell_exec('ffmpeg -i ./data/mp3/'. $audiofile . ' '.$path_parts['filename'].'.ogg');');
+		// var_dump($this->params);
 		$request = $this->getRequest();
 		if ($request->isPost()) {
 			$sDir=$request->getPost()->title;
-			$sFiles = $this->dirToArray($sDir);
-
-
-			var_dump($sDir);
-			var_dump($sFiles);
-			$cmd_rm = 'rm ' . $sDir . '/*.ogg';
-			shell_exec($cmd_rm);
+			if(is_dir($sDir)) {
+				$sFiles = $this->dirToArray($sDir, true);
+				$cmd_rm = 'rm ' . $sDir . '/*.ogg';
+				shell_exec($cmd_rm);
+			} else {
+				$sFiles[] = $sDir;
+			}
+				// $cmd_conv = 'ffmpeg -i '. $sourceFile .'  -acodec libvorbis  '. $targetFile;
+				// var_dump($cmd_conv);
+					// shell_exec($cmd_conv);
+			// var_dump($request->getPost());
+			// var_dump($sDir);
+			// var_dump($sFiles);
 			foreach ($sFiles as $sFile) {
 				$sFile_parts = pathinfo($sFile);
-				if ($sFile_parts['extension'] == 'mp3')
-				{
-					$sourceFile = $sDir . '/'.$sFile;
-					$targetFile =  str_replace('.mp3', '.ogg', $sourceFile);
-					
-					$cmd_conv = 'ffmpeg -i '. $sourceFile .'  -acodec libvorbis  '. $targetFile;
-					// var_dump($command);
-
-
-					shell_exec($cmd_conv);
+				$sourceFile = $sFile;
+				$targetFile =  $sFile_parts['dirname'].'/'.$sFile_parts['filename'].'.ogg';
+				$cmd_conv = 'ffmpeg -i '. $sourceFile .'  -acodec libvorbis  '. $targetFile;
+				// var_dump($cmd_conv);
+				shell_exec($cmd_conv);
 				// shell_exec('ffmpeg -i '. $sDir . '/'.$sFile .' '. $sDir. '/ogg/'.$sFile_parts['basename'].'.ogg' );
-				}
 			}
-
 		}
-
 		return false;
-
 	}
-	
-	function dirToArray($dir) { 
+	public function fineAction()
+	{
+		$logfile = './mp3splt.log';
+		$logArray =  file($logfile);
+		array_splice($logArray,  0, 2);     
 
+		for ($i=0; $i<count($logArray); $i++) {
+			$logArray[$i] = preg_split("/[\s,]+/", $logArray[$i]);
+			array_splice($logArray[$i], 2, 2);
+		}
+		sort ($logArray);
+		$request = $this->getRequest();
+		if ($request->isPost()) {
+			$audioFile=str_replace('./public/', '/', substr($request->getPost()->title, 0, -4));
+			var_dump($audioFile);
+		}
+		return array(
+			'logArray' => $logArray,
+			'audioFile' => $audioFile,
+			);
+	}
+	public function spltAction()
+	{
+	// Consumes the configuration array
+		$reader = new \Zend\Config\Reader\Json();
+		$data   = $reader->fromFile('./config/autoload/config.json');
+		$form = new DirForm();
+		$request = $this->getRequest();
+		if ($request->isPost()) {
+			var_dump($request->getPost());
+			$audioFile = $request->getPost()->title;
+			$fileInfo = pathinfo($audioFile);
+			$audioSDir =  $fileInfo['dirname'];
+			$audioTDir =  $audioSDir.'/../'.$fileInfo['filename'].'/';
+			var_dump($audioFile);
+			var_dump($fileInfo);
+			var_dump($audioSDir);
+			var_dump($audioTDir);
+			$cmd_splt = " rm -rf $audioTDir* && mp3splt -s  $audioFile  -d $audioTDir  && cp ./mp3splt.log  $audioTDir";
+			var_dump($cmd_splt);
+			// $spltlog = shell_exec($cmd_splt);
+			// var_dump($spltlog);
+			if( file_exists($audioTDir) ) {
+				$files = $this->dirToArray($audioTDir);
+				krsort($files);
+			}
+			$resFile = str_replace('.mp3', '', str_replace('./public', '', $audioFile));
+			return array('files' => $files, 'audioFile' => $resFile, 'dir' => $audioTDir, 'form' => $form);
+		}
+		return false;
+	} 
+	public function spltdirAction()
+	{
+	// Consumes the configuration array
+		$reader = new \Zend\Config\Reader\Json();
+		$data   = $reader->fromFile('./data/config.json');
+		// $dir = './public/';
+		$form = new DirForm();
+		$request = $this->getRequest();
+		if ($request->isPost()) {
+			var_dump($request->getPost());
+			$audioFile = $request->getPost()->title;
+			$fileInfo = pathinfo($audioFile);
+			$audioSDir =  $fileInfo['dirname'];
+			$audioTDir =  $audioSDir.'/../'.$fileInfo['filename'].'/';
+			var_dump($audioFile);
+			var_dump($fileInfo);
+			var_dump($audioSDir);
+			var_dump($audioTDir);
+			$cmd_splt = " rm -rf $audioTDir* && mp3splt -s  $audioFile  -d $audioTDir  && cp ./mp3splt.log  $audioTDir";
+			var_dump($cmd_splt);
+			// $spltlog = shell_exec($cmd_splt);
+			// var_dump($spltlog);
+			if( file_exists($audioTDir) ) {
+				$files = $this->dirToArray($audioTDir);
+				krsort($files);
+			}
+			$resFile = str_replace('.mp3', '', str_replace('./public', '', $audioFile));
+			return array('files' => $files, 'audioFile' => $resFile, 'dir' => $audioTDir, 'form' => $form);
+		}
+		return false;
+	} 
+	function dirToArray($dir, $path = false) { 
 		$result = array(); 
-
 		$cdir = scandir($dir); 
 		foreach ($cdir as $key => $value) 
 		{ 
@@ -82,60 +185,11 @@ class FfmpegController extends AbstractActionController
 				} 
 				else 
 				{ 
-					$result[] = $value; 
+					// (!$path) ? $result[] =  $value : $result[] = $dir . DIRECTORY_SEPARATOR . $value; 
+					$result[] =  (!$path) ? $value : $dir . DIRECTORY_SEPARATOR . $value; 
 				} 
 			} 
 		} 
-
 		return $result; 
 	}
-
-
-	function php_file_tree_dir($directory, $return_link, $extensions = array(), $first_call = true) 
-	{
-		$php_file_tree = '';
-	// Recursive function called by php_file_tree() to list directories/files
-
-	// Get and sort directories/files
-		$file = scandir($directory); 
-		natcasesort($file);
-	// Make directories first
-		$files = $dirs = array();
-		foreach($file as $this_file) {
-			if( is_dir("$directory/$this_file" ) ) $dirs[] = $this_file; else $files[] = $this_file;
-		}
-		$file = array_merge($dirs, $files);
-
-		var_dump($file);
-
-		if( count($file) > 2 ) { 
-	// Use 2 instead of 0 to account for . and .. "directories"
-			$php_file_tree = "<ul";
-			if( $first_call ) { 
-				$php_file_tree .= " class=\"php-file-tree\""; 
-				$first_call = false; 
-			}
-			$php_file_tree .= ">";
-			foreach( $file as $this_file ) {
-				if( $this_file != "." && $this_file != ".." ) {
-					if( is_dir("$directory/$this_file") ) {
-					// Directory
-						$php_file_tree .= "<li class=\"pft-directory\"><a href=\"#\">" . htmlspecialchars($this_file) . "</a>";
-						$php_file_tree .= $this->php_file_tree_dir("$directory/$this_file", $return_link ,$extensions, false);
-						$php_file_tree .= "</li>";
-					} else {
-					// File
-					// Get extension (prepend 'ext-' to prevent invalid classes from extensions that begin with numbers)
-						$ext = "ext-" . substr($this_file, strrpos($this_file, ".") + 1); 
-						$link = str_replace("[link]", "$directory/" . urlencode($this_file), $return_link);
-						$php_file_tree .= "<li class=\"pft-file " . strtolower($ext) . "\"><a href=\"$link\">" . htmlspecialchars($this_file) . "</a></li>";
-					}
-				}
-			}
-			$php_file_tree .= "</ul>";
-		}
-		return $php_file_tree;
-	}
-
 }
-

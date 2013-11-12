@@ -37,7 +37,7 @@ class dirForm extends Form
 			));
 		$this->add(array(
 			'name' => 'process',
-			// 'type' => 'Zend\Form\Element\Button',
+			'type' => 'Zend\Form\Element\Button',
 			'type' => 'Submit',
 			'options' => array(
 				'value' => 'Process',
@@ -48,7 +48,7 @@ class dirForm extends Form
 			'name' => 'submit',
 			'type' => 'Submit',
 			'attributes' => array(
-				'value' => 'Go',
+				'value' => 'Submit',
 				'id' => 'submitbutton',
 				),
 			));

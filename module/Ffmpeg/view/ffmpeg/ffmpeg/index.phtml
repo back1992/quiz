@@ -1,43 +1,60 @@
 <?php
 // module/Album/view/album/album/index.phtml:
-$this->headLink()->appendStylesheet($this->basePath('./js/jqueryFileTree/jqueryFileTree.css'));
-$this->headLink()->appendStylesheet($this->basePath('./js/jquery_folder_tree/style.css'));
-$this->headScript()->appendFile($this->basePath('./js/jqueryFileTree/jqueryFileTree.js'),
-	'text/javascript');
-$this->headScript()->appendFile($this->basePath('./js/jquery_folder_tree/jquery.foldertree.js'), 'text/javascript');
-
+$this->headLink()->appendStylesheet($this->basePath('./js/phpFileTree/styles/default/default.css'));
 $title = 'FFMpeg and Mp3splt  Scan';
 $this->headTitle($title);
 ?>
 <h1><?php echo $this->escapeHtml($title); ?></h1>
+<div class="row">
+	<div class="col-md-4">
+		<h4 >Current Directory is :       <span class="text-info">" <?php echo $this->dir; ?> "</span></h4>
 
+		<ul class="php-file-tree">
+			<?php
+			foreach ($this->files as $key => $file) {
+				echo $this->partial('partial/filetree.phtml', array(
+					'file' => $file, 'key' => $key)); 
+			}
+			?>
+		</ul>
+	</div>
+	<div class="col-md-8">
+		<?php 
+		$form = $this->form;
+		// $form->setAttribute('action', $this->url('ffmpeg', array('action' => 'convert')));
+		$form->prepare();
+		echo $this->form()->openTag($form);
+		echo $this->formHidden($form->get('id'));
+		echo $this->formRow($form->get('title'));
+		// echo $this->formRow($form->get('artist'));
+		echo $this->formSubmit($form->get('submit')->setValue('Convert Mp3 to Ogg'));
+		echo $this->formSubmit($form->get('submit')->setValue('Split by Silence'));
+		echo $this->formSubmit($form->get('submit')->setValue('Fine Tune'));
+		echo $this->form()->closeTag();
 
-	<script type="text/javascript">
-		$(document).ready(function(){
-			$("#smallbrowser").folderTree({
-				root: '/',
-				script: 'foldertree',
-				loadMessage: 'My loading message...'
-			})
-			// .click(function(event) { 
-				// var elementClicked = event.target;  
-				// alert(elementClicked); /
-				// var mybutton ='<?php echo $this->formRow($form->get('process')); ?>';
-				// var mybutton ='<input onclick="exec(\'ls\')" value="执行noteppad.exe" type="button"> ';
-				// var mybutton ="<button onclick=\"startprocess();\">Start</button> ";
-				// var mybutton ="<button onclick=\"startprocess();\">Start</button> ";
-				// console.log(mybutton);
-				// var newtr =  "<tr><td>1</td><td>"+elementClicked.pathname.slice(1, -1 ) +"</td><td>"+ mybutton +"</td></tr>"
-				// $("tbody").append(newtr);
-			// });/**/
-			$("#smallbrowser").css({
-				"color": "#666666",
-				"font-family": "Helvetica Neue ,Helvetica,Arial,sans-serif",
-				"font-size": "12px",
-				"line-height": "1.5"
-			});
-			$('#container_id').fileTree({root: './public/'}, function(file) {
-				alert(file);
-			});
-		});
+		?>
+	</div>
+</div>
+<script type="text/javascript">
+	$(document).ready( function() {
+
+	// Hide all subfolders at startup
+	$(".php-file-tree").find("UL").hide();
+	
+	// Expand/collapse on click
+	$(".pft-directory A").click( function() {
+		$(this).parent().find("UL:first").slideToggle("medium");
+		var dir = $(this).closest( "LI" ).children().first().text();
+		var i = 1;
+		while($(this).parents().eq(i).closest( "LI" ).children().first().text() !== '')
+		{
+			dir = $(this).parents().eq(i).closest( "LI" ).children().first().text() + '/' + dir; 
+			i += 2;
+		}
+		$("input[name=title]").val('<?php echo $this->dir; ?>'+dir);
+		if( $(this).parent().attr('className') == "pft-directory" ) return false;
+		return false;
+	});
+
+});
 </script>

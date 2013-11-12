@@ -13,10 +13,10 @@
         "zendframework/zendframework": "2.2.*",
         "doctrine/doctrine-orm-module": "0.7.*",
         "zendframework/zend-developer-tools": "dev-master",
-        "doctrine/doctrine-mongo-odm-module": "dev-master",
         "zf-commons/zfc-user": "dev-master",
         "bjyoungblood/bjy-profiler":"*",
         "zendframework/zftool": "dev-master",
-        "bootstrap-glyphicons": "*"
+        "dlu/dlutwbootstrap": "dev-master",
+        "emagister/zend-form-decorators-bootstrap" : "*"
     }
 }

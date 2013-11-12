@@ -21,9 +21,9 @@ class UploadForm extends Form
     public function addElements()
     {
         // File Input
-        $file = new Element\File('image-file');
-        $file->setLabel('Avatar Image Upload')
-             ->setAttribute('id', 'image-file');
+        $file = new Element\File('audio-file');
+        $file->setLabel('Upload Audio File')
+             ->setAttribute('id', 'audio-file');
         $this->add($file);
     }
 }

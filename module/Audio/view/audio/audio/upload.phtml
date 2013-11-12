@@ -1,0 +1,43 @@
+<?php
+// module/Album/view/audio/audio/index.phtml:
+$title = 'My Audio files';
+$this->headTitle($title);
+?>
+<h1><?php echo $this->escapeHtml($title); ?></h1>
+<p>
+</p>
+<div id="contentarea">
+	<div id="innercontentarea">
+		<h1>Upload Audio</h1>
+		<?php if($this->flag): ?>
+			<h3>File Uploaded. Id <?php echo $id; ?> </h3>
+			<p>
+			<a href="<?php echo $this->url('audio',  array('action' => 'upload'));?>"> 
+				Upload another?
+			</a>
+			</p>
+			<p>
+			<a href="<?php echo $this->url('audio',  array('action' => 'audioindb'));?>"> 
+				list Audio file in MongoDB?
+			</a>
+			</p>
+		<?php else: ?>
+			<?php $form->prepare(); // The correct enctype is set here ?>
+			<?php echo $this->form()->openTag($form); ?>
+			<div class="form-element">
+				<?php echo $this->formRow($form->get('caption')).'<br />'; ?>
+				<?php $fileElement = $form->get('audio-file'); ?>
+				<?php echo $this->formLabel($fileElement); ?>
+				<?php echo $this->formFile($fileElement); ?>
+				<?php echo $this->formElementErrors($fileElement); ?>
+			</div>
+
+			<button>Submit</button>
+
+			<?php echo $this->form()->closeTag(); ?>
+		<?php endif; ?>
+	</div>
+
+
+</div>
+
