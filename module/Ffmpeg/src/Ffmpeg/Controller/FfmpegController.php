@@ -44,6 +44,12 @@ class FfmpegController extends AbstractActionController
 					));
 				// return $this->redirect()->toRoute('ffmpeg',  array('action' => 'splt'));
 				return $returnValue;
+				case 'Edit the Audio':
+				$returnValue = $forwardPlugin->dispatch('Ffmpeg\Controller\Ffmpeg', array(
+					'action' => 'edit'
+					));
+				// return $this->redirect()->toRoute('ffmpeg',  array('action' => 'splt'));
+				return $returnValue;
 				break;
 				case 'Fine Tune':
 				$returnValue = $forwardPlugin->dispatch('Ffmpeg\Controller\Ffmpeg', array(
@@ -57,6 +63,9 @@ class FfmpegController extends AbstractActionController
 			}
 		}
 		return array('files' => $files, 'dir' => $dir, 'form' => $form);
+	}
+	public function editAction()
+	{
 	}
 	public function convertAction()
 	{

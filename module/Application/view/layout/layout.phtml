@@ -13,12 +13,12 @@
       <!-- Le styles -->
       <?php echo $this->headLink(array('rel' => 'shortcut icon', 'type' => 'image/vnd.microsoft.icon', 'href' => $this->basePath() . '/img/favicon.ico'))
       ->prependStylesheet($this->basePath() . '/css/style.css')
-      ->prependStylesheet($this->basePath() . '/css/bootstrap-theme.min.css')
-      ->prependStylesheet($this->basePath() . '/css/bootstrap.min.css') ?>
+      ->prependStylesheet('//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap-theme.min.css')
+      ->prependStylesheet('//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css') ?>
 
       <!-- Scripts -->
       <?php echo $this->headScript()
-      ->prependFile($this->basePath() . '/js/bootstrap.min.js')
+      ->prependFile('//netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js')
       ->prependFile('//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js')
     // ->prependFile($this->basePath() . '/js/jquery.min.js')
       ->prependFile($this->basePath() . '/js/respond.min.js', 'text/javascript', array('conditional' => 'lt IE 9',))
@@ -59,14 +59,11 @@
                   <li><a href="<?php echo $this->url('audio') ?>">Audio</a></li>
                   <li><a href="<?php echo $this->url('audio', array('action' => 'upload')) ?>">Upload Audio</a></li>
                   <li><a href="<?php echo $this->url('audio', array('action' => 'fetchaudio')) ?>">Fetch Audio</a></li>
+                  <li><a href="<?php echo $this->url('audio', array('action' => 'edit')) ?>">Edit Audio</a></li>
+                  <li class="divider"></li>
                   <li><a href="<?php echo $this->url('audio', array('action' => 'readlog')) ?>">Read Mp3Splt Log</a></li>
                   <li><a href="<?php echo $this->url('audio', array('action' => 'scan')) ?>">Audio in Directory</a></li>
                   <li><a href="<?php echo $this->url('audio', array('action' => 'audioindb')) ?>">Audio in Database </a></li>
-                  <li><a href="#">Something else here</a></li>
-                  <li class="divider"></li>
-                  <li><a href="#">Separated link</a></li>
-                  <li class="divider"></li>
-                  <li><a href="#">One more separated link</a></li>
                 </ul>
               </li>
               <li class="dropdown">
