@@ -9,7 +9,6 @@ class FfmpegController extends AbstractActionController
 {
 	public function indexAction()
 	{
-		$form = new DirForm();
 		// $data = array(
 		// 	'title'    => './public/audio',
 		// 	);
@@ -28,7 +27,7 @@ class FfmpegController extends AbstractActionController
 		$request = $this->getRequest();
 		if ($request->isPost()) {
 			// $sDir=$request->getPost()->title;
-			var_dump($request->getPost()->submit);
+			// var_dump($request->getPost());
 			// var_dump($request);
 			$forwardPlugin = $this->forward();
 			switch ($request->getPost()->submit)
@@ -66,6 +65,19 @@ class FfmpegController extends AbstractActionController
 	}
 	public function editAction()
 	{
+		$form = new DirForm();
+		$request = $this->getRequest();
+		if ($request->isPost()) {
+			$audioFile = str_replace('./public/', '/', substr($request->getPost()->title, 0, -4));
+			// var_dump($request->getPost());
+			$data = array(
+				'title'    => $request->getPost()->title,
+				);
+			$form->setData($data);
+		} 
+				// var_dump($form);
+		// return false;
+		return array('audioFile' => $audioFile, 'form' => $form);
 	}
 	public function convertAction()
 	{
@@ -181,6 +193,10 @@ class FfmpegController extends AbstractActionController
 		}
 		return false;
 	} 
+
+	function rangeAction() {
+		
+	}
 	function dirToArray($dir, $path = false) { 
 		$result = array(); 
 		$cdir = scandir($dir); 

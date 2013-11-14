@@ -1,0 +1,15 @@
+<html>
+  <head>
+  <script type="text/javascript">
+    function updateTextInput(val) {
+      document.getElementById('textInput').value=val; 
+    }
+  </script>
+  </head>
+  <body>
+    <input type="range" name="rangeInput" min="0" max="100" onchange="updateTextInput(this.value);">                                                       
+    <input type="text" id="textInput" value="">
+  </body>
+</html>
+
+<input type="range" value="" onchange="updateTextInput(this.value);" step="2" max="10" min="0" name="range" style="margin-left: 10px;">

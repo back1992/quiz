@@ -47,19 +47,38 @@ class dirForm extends Form
 				),
 			));
 		$this->add(array(
-			'name' => 'process',
-			'type' => 'Zend\Form\Element\Button',
-
-			// 'type' => 'Submit',
+			'name' => 'inputvalue',
+			'type' => 'text',
 			'options' => array(
-				'value' => 'Process',
-				'label' => 'Process'
-				)
+				'label' => 'inputValue: ',
+
+				),
+			'attributes' => array(
+				// 'id' => 'inputValue',
+				'style' => 'background-color:#b0e0e6;',
+				'class' => 'text-center'
+
+				),
+			));
+		$this->add(array(
+			'name' => 'range',
+			'type' => 'Range',
+			'options' => array(
+				'label' => 'Range',
+				),
+			'attributes' => array(
+				'onchange' => "updateTextInput(this, this.value);"
+				),
 			));
 		$this->add(array(
 			'name' => 'submit',
 			'type' => 'Submit',
+			'separator' => '<br />',
+			'decorators' => '<br />',
 			// 'type' => 'Zend\Form\Element\Button',
+			'options' => array(
+				'separator' => '<br />',
+				),
 
 			'attributes' => array(
 				'value' => 'Submit',
