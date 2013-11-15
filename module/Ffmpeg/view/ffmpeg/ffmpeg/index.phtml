@@ -6,18 +6,11 @@ $this->headTitle($title);
 ?>
 <h1><?php echo $this->escapeHtml($title); ?></h1>
 <div class="row">
-	<div class="col-md-7">
-		<h4 >Current Directory is :       <span class="text-info">" <?php echo $this->dir; ?> "</span></h4>
-		<ul class="php-file-tree">
-			<?php
-			foreach ($this->files as $key => $file) {
-				echo $this->partial('partial/filetree.phtml', array(
-					'file' => $file, 'key' => $key)); 
-			}
-			?>
-		</ul>
+	<h4 >Current Directory is :       <span class="text-info">" <?php echo $this->dir; ?> "</span></h4>
+	<div id = "dir" class="col-md-6">
+		<?php echo $this->filelist ?>
 	</div>
-	<div class="col-md-5">
+	<div class="col-md-6">
 		<?php 
 		$form = $this->form;
 		// $form->setAttribute('action', $this->url('ffmpeg', array('action' => 'convert')));
@@ -26,9 +19,6 @@ $this->headTitle($title);
 		echo $this->formHidden($form->get('id'));
 		// echo $this->formRow($form->get('title'),  array('class' => 'help-inline'));
 		echo $this->formRow($form->get('title'));
-		echo $this->formRange($form->get('range'));
-		echo $this->formRow($form->get('inputvalue'));
-		// echo $this->formRow($form->get('artist'));
 		echo $this->formSubmit($form->get('submit')->setValue('Convert Mp3 to Ogg'));
 		echo $this->formSubmit($form->get('submit')->setValue('Split by Silence'));
 		echo $this->formSubmit($form->get('submit')->setValue('Edit the Audio'));
@@ -59,8 +49,17 @@ $this->headTitle($title);
 		if( $(this).parent().attr('className') == "pft-directory" ) return false;
 		return false;
 	});
-	$("input").css({'margin-left':'10px'}).wrap('<p class="form-group "></p>');
-	// $("input[name=submit]").css({'margin-left':'10px'}).wrap('<p></p>');
-
+	$("input").css({'margin-left':'10px'});
+	// $("input").css({'margin-left':'10px'}).wrap('<p class="form-group "></p>');
+	$('#dir').css({'display':'block',
+		'height':'300px',
+		'background-color':'rgb(176, 224, 230)',
+		'overflow':'scroll'});
+	$('input[name="submit"]').hover( function(){
+		$(this).addClass('btn-info');
+	},
+	function(){
+		$(this).removeClass('btn-info');
+	});
 });
 </script>

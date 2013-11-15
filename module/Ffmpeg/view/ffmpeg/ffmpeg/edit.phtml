@@ -1,12 +1,25 @@
 <?php
 // module/Album/view/album/album/index.phtml:
-ini_set('display_errors', '1');
+// $this->headLink()->appendStylesheet($this->basePath('./js/html5-audio-editor/app/mainstyle.css'));
 $title = 'My Blogs';
 $this->headTitle($title);
 ?>
 <h1><?php echo $this->escapeHtml($title); ?></h1>
 <body>
     <div class="container">
+    <div class="row">
+    <h4 >Current Directory is :       <span class="text-info">" <?php echo $this->dir; ?> "</span></h4>
+    <div id = "dir" class="col-md-7">
+        <ul class="php-file-tree">
+            <?php
+            foreach ($this->files as $key => $file) {
+                echo $this->partial('partial/filetree.phtml', array(
+                    'file' => $file, 'key' => $key)); 
+            }
+            ?>
+        </ul>
+    </div>
+    
         <div class="row">
             <div class="span12">
                 <center>
@@ -18,29 +31,27 @@ $this->headTitle($title);
                             <a class="btn btn-primary" onclick="$('#audioLayerControl')[0].del();"><i class="icon-remove icon-white"></i> Delete</a>
                         </div>
                         <div class="btn-group">
-                         <a class="btn btn-success" onclick="$('#audioLayerControl')[0].selectAll();"><i class="icon-resize-horizontal icon-white"></i> Select All</a>
-                         <a class="btn btn-success" onclick="$('#audioLayerControl')[0].zoomIntoSelection();"><i class="icon-plus-sign icon-white"></i> Zoom To Selection</a>
-                         <a class="btn btn-success" onclick="$('#audioLayerControl')[0].zoomToFit();"><i class="icon-fullscreen icon-white"></i> Zoom To Fit</a>
-                     </div>
-                 </div>
-             </center>
-         </div>
-     </div>
-     <hr />
-     <div class="row">
-         <div class="span4">
-            <h6>Spectrum</h6>
-            <div class="well">
-               <div id="spectrum"></div>
+                           <a class="btn btn-success" onclick="$('#audioLayerControl')[0].selectAll();"><i class="icon-resize-horizontal icon-white"></i> Select All</a>
+                           <a class="btn btn-success" onclick="$('#audioLayerControl')[0].zoomIntoSelection();"><i class="icon-plus-sign icon-white"></i> Zoom To Selection</a>
+                           <a class="btn btn-success" onclick="$('#audioLayerControl')[0].zoomToFit();"><i class="icon-fullscreen icon-white"></i> Zoom To Fit</a>
+                       </div>
+                   </div>
+               </center>
            </div>
        </div>
-   </div>
-   <div class="row">
-       <div class="span12">
+       <hr />
+       <div class="row">
+        <h6>Spectrum</h6>
+        <div class="well">
+         <div id="spectrum"></div>
+     </div>
+ </div>
+ <div class="row">
+     <div class="span12">
         <h6>Editor</h6>
         <div class="well">
-           <audioLayerControl id="audioLayerControl" title="CloudCompany.mp3" />
-       </div>
+         <audioLayerControl id="audioLayerControl" title="CloudCompany.mp3" />
+     </div>
           <!--<div id="editor">
                 <div id="editorbox">
                     <audioLayerControl id="audioLayerControl" title="CloudCompany.mp3" />
@@ -111,11 +122,11 @@ $this->headTitle($title);
                 )));
             echo '<span class="help-block">Positive float of the minimum number of seconds to be considered as valid silence. All silences shorter than min are discarded. Default is 0. For the trim silence split, it is the minimum silence length to trigger a trimming; this amount of silence will be kept in the split file at the beginning and at the end.</span>';
         // echo $this->formRow($form->get('artist'));
-             echo $this->formSubmit($form->get('submit')->setValue('Resplit by Silence')->setAttributes(array('class' => 'btn btn-primary')));
-             echo $this->form()->closeTag();
-             ?>
-         </div>
-<p class="pull-right"><a href="#">Back to top</a></p>
+            echo $this->formSubmit($form->get('submit')->setValue('Resplit by Silence')->setAttributes(array('class' => 'btn btn-primary')));
+            echo $this->form()->closeTag();
+            ?>
+        </div>
+        <p class="pull-right"><a href="#">Back to top</a></p>
     <!-- Le javascript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
@@ -155,6 +166,7 @@ $this->headTitle($title);
           var rightEditor = audioLayerControl.createSequenceEditor("Right Channel");
           audioLayerControl.setLinkMode(true);
           $('#audioid').css({"width": "100%","margin-left": "2px"});
+          $('input').css({"margin-left": "15px"})
       });
     </script>
 </body>

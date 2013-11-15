@@ -1,122 +1,206 @@
 <?php
-
 namespace Ffmpeg\Controller;
-
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 use Ffmpeg\Form\DirForm;
 use Zend\Stdlib\Hydrator;
-
+use Zend\Config\Config;
 class FfmpegController extends AbstractActionController
 {
-
 	public function indexAction()
 	{
-		$dir = './public/audio';
-		// $audioArr = scandir($dir);
-		// array_splice($audioArr,  0, 3);   
-		// $hydrator = new Hydrator\ArraySerializable();
-
-
-		// $audioArr = $this->dirToArray($dir);
-		// $title = array_keys($audioArr);
-		// $title = array('title' => array_keys($audioArr));
-		// $title = array('title' => 'title123');
-
-
-		$form = new DirForm();
-		// $form->setData($title);
-		return array(
-			'form' => $form,
-			'title' => $title,
-			'dir' => $dir,
+		// $data = array(
+		// 	'title'    => './public/audio',
+		// 	);
+		$config = $this->getServiceLocator()->get('Config');
+		echo $config['settings']['settingA'];
+		$reader = new \Zend\Config\Reader\Json();
+		$readdata   = $reader->fromFile('./config/autoload/config.json');
+		$data = array(
+			'title'    => $readdata['audiodata'],
 			);
+		$form = new DirForm();
+		$form->setData($data);
+		$dir = $readdata['audiodata'];
+		if( file_exists($dir) ) {
+			$files = $this->dirToArray($dir);
+			krsort($files);
+		}
+		$request = $this->getRequest();
+		if ($request->isPost()) {
+			// $sDir=$request->getPost()->title;
+			// var_dump($request->getPost());
+			// var_dump($request);
+			$forwardPlugin = $this->forward();
+			switch ($request->getPost()->submit)
+			{
+				case 'Convert Mp3 to Ogg':
+				$returnValue = $forwardPlugin->dispatch('Ffmpeg\Controller\Ffmpeg', array(
+					'action' => 'convert'
+					));
+				break;  
+				case 'Split by Silence':
+				$returnValue = $forwardPlugin->dispatch('Ffmpeg\Controller\Ffmpeg', array(
+					'action' => 'splt'
+					));
+				// return $this->redirect()->toRoute('ffmpeg',  array('action' => 'splt'));
+				return $returnValue;
+				case 'Edit the Audio':
+				$returnValue = $forwardPlugin->dispatch('Ffmpeg\Controller\Ffmpeg', array(
+					'action' => 'edit'
+					));
+				// return $this->redirect()->toRoute('ffmpeg',  array('action' => 'splt'));
+				return $returnValue;
+				break;
+				case 'Fine Tune':
+				$returnValue = $forwardPlugin->dispatch('Ffmpeg\Controller\Ffmpeg', array(
+					'action' => 'fine'
+					));
+				// return $this->redirect()->toRoute('ffmpeg',  array('action' => 'splt'));
+				return $returnValue;
+				break;
+				default:
+				return false;
+			}
+		}
+		return array('files' => $files, 'dir' => $dir, 'form' => $form);
 	}
-
-	public function ajaxAction()
+	public function editAction()
 	{
-		
+		$form = new DirForm();
+		$request = $this->getRequest();
+		if ($request->isPost()) {
+			$audioFile = str_replace('./public/', '/', substr($request->getPost()->title, 0, -4));
+			// var_dump($request->getPost());
+			$data = array(
+				'title'    => $request->getPost()->title,
+				);
+			$form->setData($data);
+		} 
+				// var_dump($form);
+		// return false;
+		return array('audioFile' => $audioFile, 'form' => $form);
 	}
-
-
 	public function convertAction()
 	{
 		// system('shell_exec('ffmpeg -i ./data/mp3/'. $audiofile . ' '.$path_parts['filename'].'.ogg');');
+		// var_dump($this->params);
 		$request = $this->getRequest();
 		if ($request->isPost()) {
-			$sdir=$request->getPost();
-			var_dump($sdir);
+			$sDir=$request->getPost()->title;
+			if(is_dir($sDir)) {
+				$sFiles = $this->dirToArray($sDir, true);
+				$cmd_rm = 'rm ' . $sDir . '/*.ogg';
+				shell_exec($cmd_rm);
+			} else {
+				$sFiles[] = $sDir;
+			}
+				// $cmd_conv = 'ffmpeg -i '. $sourceFile .'  -acodec libvorbis  '. $targetFile;
+				// var_dump($cmd_conv);
+					// shell_exec($cmd_conv);
+			// var_dump($request->getPost());
+			// var_dump($sDir);
+			// var_dump($sFiles);
+			foreach ($sFiles as $sFile) {
+				$sFile_parts = pathinfo($sFile);
+				$sourceFile = $sFile;
+				$targetFile =  $sFile_parts['dirname'].'/'.$sFile_parts['filename'].'.ogg';
+				$cmd_conv = 'ffmpeg -i '. $sourceFile .'  -acodec libvorbis  '. $targetFile;
+				// var_dump($cmd_conv);
+				shell_exec($cmd_conv);
+				// shell_exec('ffmpeg -i '. $sDir . '/'.$sFile .' '. $sDir. '/ogg/'.$sFile_parts['basename'].'.ogg' );
+			}
 		}
 		return false;
-
 	}
-	public function foldertreeAction()
+	public function fineAction()
 	{
-		$base = $_SERVER['DOCUMENT_ROOT'];
-		if(isset($_REQUEST['dir'])){
-			$dir=urldecode($_REQUEST['dir']);
-		}else{
-			$dir='/';
+		$logfile = './mp3splt.log';
+		$logArray =  file($logfile);
+		array_splice($logArray,  0, 2);     
+
+		for ($i=0; $i<count($logArray); $i++) {
+			$logArray[$i] = preg_split("/[\s,]+/", $logArray[$i]);
+			array_splice($logArray[$i], 2, 2);
 		}
-		if( file_exists($base.$dir) ) {
-			$files = scandir($base.$dir);
-			natcasesort($files);
-			if( count($files) > 2){ /* The 2 accounts for . and .. */
-		echo '<ul class="jqueryFolderTree" style="display: none;" >'; //style="display: none;"
-		// All dirs
-		foreach($files as $file){
-			if( file_exists($base.$dir.$file) && $file != '.' && $file != '..' && is_dir($base.$dir.$file)){
-				if($this->check_for_subdirs($base.$dir.$file)==true){
-					echo '<li><a href="#" class="collapsed" rel="'.$dir.$file.'/"></a><a href="'.$dir.$file.'/" class="folder">'.$file.'</a></li>';
-				}else{
-					echo '<li><a href="#"   class="nosubs"  rel="'.$dir.$file.'/"></a><a href="'.$dir.$file.'/"  class="folder">'.$file.'</a></li>';
-				}
-			}
+		sort ($logArray);
+		$request = $this->getRequest();
+		if ($request->isPost()) {
+			$audioFile=str_replace('./public/', '/', substr($request->getPost()->title, 0, -4));
+			var_dump($audioFile);
 		}
-		echo '</ul>';	
+		return array(
+			'logArray' => $logArray,
+			'audioFile' => $audioFile,
+			);
 	}
-}
-return false;
-}
-
-
-public function ajaxphpAction()
-{
-	$_POST['dir'] = urldecode($_POST['dir']);
-	$root = './public';
-
-
-	if( file_exists($root . $_POST['dir']) ) {
-		$files = scandir($root . $_POST['dir']);
-		natcasesort($files);
-		if( count($files) > 2 ) { /* The 2 accounts for . and .. */
-			echo "<ul class=\"jqueryFileTree\" style=\"display: none;\">";
-		// All dirs
-			foreach( $files as $file ) {
-				if( file_exists($root . $_POST['dir'] . $file) && $file != '.' && $file != '..' && is_dir($root . $_POST['dir'] . $file) ) {
-					echo "<li class=\"directory collapsed\"><a href=\"#\" rel=\"" . htmlentities($_POST['dir'] . $file) . "/\">" . htmlentities($file) . "</a></li>";
-				}
+	public function spltAction()
+	{
+	// Consumes the configuration array
+		$reader = new \Zend\Config\Reader\Json();
+		$data   = $reader->fromFile('./config/autoload/config.json');
+		$form = new DirForm();
+		$request = $this->getRequest();
+		if ($request->isPost()) {
+			var_dump($request->getPost());
+			$audioFile = $request->getPost()->title;
+			$fileInfo = pathinfo($audioFile);
+			$audioSDir =  $fileInfo['dirname'];
+			$audioTDir =  $audioSDir.'/../'.$fileInfo['filename'].'/';
+			var_dump($audioFile);
+			var_dump($fileInfo);
+			var_dump($audioSDir);
+			var_dump($audioTDir);
+			$cmd_splt = " rm -rf $audioTDir* && mp3splt -s  $audioFile  -d $audioTDir  && cp ./mp3splt.log  $audioTDir";
+			var_dump($cmd_splt);
+			// $spltlog = shell_exec($cmd_splt);
+			// var_dump($spltlog);
+			if( file_exists($audioTDir) ) {
+				$files = $this->dirToArray($audioTDir);
+				krsort($files);
 			}
-		// All files
-/*				foreach( $files as $file ) {
-					if( file_exists($root . $_POST['dir'] . $file) && $file != '.' && $file != '..' && !is_dir($root . $_POST['dir'] . $file) ) {
-						$ext = preg_replace('/^.*\./', '', $file);
-						echo "<li class=\"file ext_$ext\"><a href=\"#\" rel=\"" . htmlentities($_POST['dir'] . $file) . "\">" . htmlentities($file) . "</a></li>";
-					}
-				}*/
-				echo "</ul>";	
-			}
+			$resFile = str_replace('.mp3', '', str_replace('./public', '', $audioFile));
+			return array('files' => $files, 'audioFile' => $resFile, 'dir' => $audioTDir, 'form' => $form);
 		}
-
 		return false;
+	} 
+	public function spltdirAction()
+	{
+	// Consumes the configuration array
+		$reader = new \Zend\Config\Reader\Json();
+		$data   = $reader->fromFile('./data/config.json');
+		// $dir = './public/';
+		$form = new DirForm();
+		$request = $this->getRequest();
+		if ($request->isPost()) {
+			var_dump($request->getPost());
+			$audioFile = $request->getPost()->title;
+			$fileInfo = pathinfo($audioFile);
+			$audioSDir =  $fileInfo['dirname'];
+			$audioTDir =  $audioSDir.'/../'.$fileInfo['filename'].'/';
+			var_dump($audioFile);
+			var_dump($fileInfo);
+			var_dump($audioSDir);
+			var_dump($audioTDir);
+			$cmd_splt = " rm -rf $audioTDir* && mp3splt -s  $audioFile  -d $audioTDir  && cp ./mp3splt.log  $audioTDir";
+			var_dump($cmd_splt);
+			// $spltlog = shell_exec($cmd_splt);
+			// var_dump($spltlog);
+			if( file_exists($audioTDir) ) {
+				$files = $this->dirToArray($audioTDir);
+				krsort($files);
+			}
+			$resFile = str_replace('.mp3', '', str_replace('./public', '', $audioFile));
+			return array('files' => $files, 'audioFile' => $resFile, 'dir' => $audioTDir, 'form' => $form);
+		}
+		return false;
+	} 
+
+	function rangeAction() {
+		
 	}
-
-
-
-	public function dirToArray($dir) { 
-
+	function dirToArray($dir, $path = false) { 
 		$result = array(); 
-
 		$cdir = scandir($dir); 
 		foreach ($cdir as $key => $value) 
 		{ 
@@ -128,27 +212,11 @@ public function ajaxphpAction()
 				} 
 				else 
 				{ 
-					$result[] = $value; 
+					// (!$path) ? $result[] =  $value : $result[] = $dir . DIRECTORY_SEPARATOR . $value; 
+					$result[] =  (!$path) ? $value : $dir . DIRECTORY_SEPARATOR . $value; 
 				} 
 			} 
 		} 
-
 		return $result; 
-	} 
-
-	function check_for_subdirs($path){
-		$found = false;
-		$items = scandir($path);
-		foreach($items as $item){
-			if($item != '.' && $item != '..' && is_dir($path.'/'.$item) ){
-				$found=true;
-				break;
-			}else{
-				$found=false;
-			}
-		}
-		return $found;
 	}
-
 }
-

@@ -4,31 +4,19 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 use Ffmpeg\Form\DirForm;
 use Zend\Stdlib\Hydrator;
-use Zend\Config\Config;
 class FfmpegController extends AbstractActionController
 {
 	public function indexAction()
 	{
-		// $data = array(
-		// 	'title'    => './public/audio',
-		// 	);
-		$reader = new \Zend\Config\Reader\Json();
-		$readdata   = $reader->fromFile('./config/autoload/config.json');
-		$data = array(
-			'title'    => $readdata['audiodata'],
-			);
+		$config = $this->getServiceLocator()->get('Config');
 		$form = new DirForm();
-		$form->setData($data);
-		$dir = $readdata['audiodata'];
+		$dir = $config['settings']['audiodata'];
 		if( file_exists($dir) ) {
 			$files = $this->dirToArray($dir);
 			krsort($files);
 		}
 		$request = $this->getRequest();
 		if ($request->isPost()) {
-			// $sDir=$request->getPost()->title;
-			// var_dump($request->getPost());
-			// var_dump($request);
 			$forwardPlugin = $this->forward();
 			switch ($request->getPost()->submit)
 			{
@@ -41,20 +29,70 @@ class FfmpegController extends AbstractActionController
 				$returnValue = $forwardPlugin->dispatch('Ffmpeg\Controller\Ffmpeg', array(
 					'action' => 'splt'
 					));
-				// return $this->redirect()->toRoute('ffmpeg',  array('action' => 'splt'));
 				return $returnValue;
 				case 'Edit the Audio':
 				$returnValue = $forwardPlugin->dispatch('Ffmpeg\Controller\Ffmpeg', array(
 					'action' => 'edit'
 					));
-				// return $this->redirect()->toRoute('ffmpeg',  array('action' => 'splt'));
 				return $returnValue;
 				break;
 				case 'Fine Tune':
 				$returnValue = $forwardPlugin->dispatch('Ffmpeg\Controller\Ffmpeg', array(
 					'action' => 'fine'
 					));
-				// return $this->redirect()->toRoute('ffmpeg',  array('action' => 'splt'));
+				return $returnValue;
+				break;
+				default:
+				return false;
+			}
+		}
+		$view = new ViewModel();
+        // this is not needed since it matches "module/controller/action"
+		// $view->setTemplate('content/article/view');
+		$indexView = new ViewModel(array('form' => $form));
+		$indexView->setTemplate('index');
+		// $filelistView = new ViewModel();
+		$filelistView = new ViewModel(array('files' => $files, 'dir' => $dir));
+		$filelistView->setTemplate('audio/filelist');
+		$view->addChild($indexView, 'index')
+		->addChild($filelistView, 'filelist');
+		return $view;
+		// return array('files' => $files, 'dir' => $dir, 'form' => $form);
+	}
+	public function index2Action()
+	{
+		$config = $this->getServiceLocator()->get('Config');
+		$form = new DirForm();
+		$dir = $config['settings']['audiodata'];
+		if( file_exists($dir) ) {
+			$files = $this->dirToArray($dir);
+			krsort($files);
+		}
+		$request = $this->getRequest();
+		if ($request->isPost()) {
+			$forwardPlugin = $this->forward();
+			switch ($request->getPost()->submit)
+			{
+				case 'Convert Mp3 to Ogg':
+				$returnValue = $forwardPlugin->dispatch('Ffmpeg\Controller\Ffmpeg', array(
+					'action' => 'convert'
+					));
+				break;  
+				case 'Split by Silence':
+				$returnValue = $forwardPlugin->dispatch('Ffmpeg\Controller\Ffmpeg', array(
+					'action' => 'splt'
+					));
+				return $returnValue;
+				case 'Edit the Audio':
+				$returnValue = $forwardPlugin->dispatch('Ffmpeg\Controller\Ffmpeg', array(
+					'action' => 'edit'
+					));
+				return $returnValue;
+				break;
+				case 'Fine Tune':
+				$returnValue = $forwardPlugin->dispatch('Ffmpeg\Controller\Ffmpeg', array(
+					'action' => 'fine'
+					));
 				return $returnValue;
 				break;
 				default:
@@ -116,7 +154,6 @@ class FfmpegController extends AbstractActionController
 		$logfile = './mp3splt.log';
 		$logArray =  file($logfile);
 		array_splice($logArray,  0, 2);     
-
 		for ($i=0; $i<count($logArray); $i++) {
 			$logArray[$i] = preg_split("/[\s,]+/", $logArray[$i]);
 			array_splice($logArray[$i], 2, 2);
@@ -193,9 +230,60 @@ class FfmpegController extends AbstractActionController
 		}
 		return false;
 	} 
-
 	function rangeAction() {
 		
+	}
+	public function viewAction()
+	{
+        // get the article from the persistence layer, etc...
+		$view = new ViewModel();
+        // this is not needed since it matches "module/controller/action"
+		$view->setTemplate('content/article/view');
+		$article = 'var article';
+		$articleView = new ViewModel(array('article' => $article));
+		$articleView->setTemplate('content/article');
+		$primarySidebarView = new ViewModel();
+		$primarySidebarView->setTemplate('content/main-sidebar');
+		$secondarySidebarView = new ViewModel();
+		$secondarySidebarView->setTemplate('content/secondary-sidebar');
+		$sidebarBlockView = new ViewModel();
+		$sidebarBlockView->setTemplate('content/block');
+		$secondarySidebarView->addChild($sidebarBlockView, 'block');
+		$view->addChild($articleView, 'article')
+		->addChild($primarySidebarView, 'sidebar_primary')
+		->addChild($secondarySidebarView, 'sidebar_secondary');
+		return $view;
+	}
+	public function viewlistAction()
+	{
+        // get the article from the persistence layer, etc...
+		$view = new ViewModel();
+        // this is not needed since it matches "module/controller/action"
+		// $view->setTemplate('content/article/view');
+		$article = 'var article';
+		$articleView = new ViewModel(array('article' => $article));
+		$articleView->setTemplate('content/article');
+		$primarySidebarView = new ViewModel();
+		$primarySidebarView->setTemplate('content/main-sidebar');
+		$config = $this->getServiceLocator()->get('Config');
+		$dir = $config['settings']['audiodata'];
+		if( file_exists($dir) ) {
+			$files = $this->dirToArray($dir);
+			krsort($files);
+		}
+		// $filelistView = new ViewModel();
+		$filelistView = new ViewModel(array('files' => $files, 'dir' => $dir));
+		$filelistView->setTemplate('audio/filelist');
+		$secondarySidebarView = new ViewModel();
+		$secondarySidebarView->setTemplate('content/secondary-sidebar');
+		$sidebarBlockView = new ViewModel();
+		$sidebarBlockView->setTemplate('content/block');
+		$secondarySidebarView->addChild($sidebarBlockView, 'block');
+		$view->addChild($articleView, 'article')
+		->addChild($primarySidebarView, 'sidebar_primary')
+		->addChild($filelistView, 'filelist')
+		->addChild($secondarySidebarView, 'sidebar_secondary');
+		return $view;
 	}
 	function dirToArray($dir, $path = false) { 
 		$result = array(); 

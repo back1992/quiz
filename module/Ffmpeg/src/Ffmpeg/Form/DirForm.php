@@ -6,14 +6,12 @@ use Zend\Form\Form;
 // use Zend\InputFilter;
 use Zend\InputFilter\InputFilter;
 use Zend\Stdlib\Hydrator\ClassMethods as ClassMethodsHydrator;
-
 class dirForm extends Form
 {
 	public function __construct($name = null)
 	{
 // we want to ignore the name passed
 		parent::__construct('dir');
-
 		$this->setAttribute('method', 'post')
 		->setHydrator(new ClassMethodsHydrator(false))
 		->setInputFilter(new InputFilter());
@@ -31,7 +29,6 @@ class dirForm extends Form
 				'checked' => 'checked',
 				'checked_value' => '1',
 				'unchecked_value' => '0'
-
 				)
 			));
 		$this->add(array(
@@ -51,13 +48,12 @@ class dirForm extends Form
 			'type' => 'text',
 			'options' => array(
 				'label' => 'inputValue: ',
-
 				),
 			'attributes' => array(
 				// 'id' => 'inputValue',
 				'style' => 'background-color:#b0e0e6;',
 				'class' => 'text-center'
-
+				// 'class' => 'text-center col-xs-4'
 				),
 			));
 		$this->add(array(
@@ -67,7 +63,7 @@ class dirForm extends Form
 				'label' => 'Range',
 				),
 			'attributes' => array(
-				'onchange' => "updateTextInput(this, this.value);"
+				'onchange' => "updateTextInput(this, this.value);",
 				),
 			));
 		$this->add(array(
@@ -79,7 +75,6 @@ class dirForm extends Form
 			'options' => array(
 				'separator' => '<br />',
 				),
-
 			'attributes' => array(
 				'value' => 'Submit',
 				'class' => 'btn btn-default',
@@ -87,3 +82,4 @@ class dirForm extends Form
 			));
 	}
 }
+	
