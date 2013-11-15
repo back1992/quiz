@@ -6,7 +6,7 @@ use Ffmpeg\Form\DirForm;
 use Zend\Stdlib\Hydrator;
 class FfmpegController extends AbstractActionController
 {
-	public function indexAction()
+	public function index2Action()
 	{
 		$config = $this->getServiceLocator()->get('Config');
 		$form = new DirForm();
@@ -59,7 +59,7 @@ class FfmpegController extends AbstractActionController
 		return $view;
 		// return array('files' => $files, 'dir' => $dir, 'form' => $form);
 	}
-	public function index2Action()
+	public function indexAction()
 	{
 		$config = $this->getServiceLocator()->get('Config');
 		$form = new DirForm();

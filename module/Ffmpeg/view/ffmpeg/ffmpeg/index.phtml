@@ -1,18 +1,24 @@
 <?php
 // module/Album/view/album/album/index.phtml:
-$this->headLink()->appendStylesheet($this->basePath('./js/phpFileTree/styles/default/default.css'));
+$this->
+headLink()->appendStylesheet($this->basePath('./js/phpFileTree/styles/default/default.css'));
 $title = 'FFMpeg and Mp3splt  Scan';
 $this->headTitle($title);
 ?>
-<h1><?php echo $this->escapeHtml($title); ?></h1>
+<h1>
+	<?php echo $this->escapeHtml($title); ?></h1>
 <div class="row">
-	<h4 >Current Directory is :       <span class="text-info">" <?php echo $this->dir; ?> "</span></h4>
-	<div id = "dir" class="col-md-6">
-		<?php echo $this->filelist ?>
-	</div>
+	<?php
+		echo $this->
+	partial('partial/filelist.phtml', array(
+			'files' => $this->files,
+			'dir' => $this->dir
+			)); 
+			?>
 	<div class="col-md-6">
 		<?php 
-		$form = $this->form;
+		$form = $this->
+		form;
 		// $form->setAttribute('action', $this->url('ffmpeg', array('action' => 'convert')));
 		$form->prepare();
 		echo $this->form()->openTag($form);
@@ -30,36 +36,14 @@ $this->headTitle($title);
 <script type="text/javascript">
 	function updateTextInput(val) {
 		document.getElementById('inputValue').value=val; 
-	}
-	$(document).ready( function() {
-	// Hide all subfolders at startup
-	$(".php-file-tree").find("UL").hide();
-	
-	// Expand/collapse on click
-	$(".pft-directory A").click( function() {
-		$(this).parent().find("UL:first").slideToggle("medium");
-		var dir = $(this).closest( "LI" ).children().first().text();
-		var i = 1;
-		while($(this).parents().eq(i).closest( "LI" ).children().first().text() !== '')
-		{
-			dir = $(this).parents().eq(i).closest( "LI" ).children().first().text() + '/' + dir; 
-			i += 2;
-		}
-		$("input[name=title]").val('<?php echo $this->dir; ?>'+dir);
-		if( $(this).parent().attr('className') == "pft-directory" ) return false;
-		return false;
-	});
+	};
 	$("input").css({'margin-left':'10px'});
 	// $("input").css({'margin-left':'10px'}).wrap('<p class="form-group "></p>');
-	$('#dir').css({'display':'block',
-		'height':'300px',
-		'background-color':'rgb(176, 224, 230)',
-		'overflow':'scroll'});
+
 	$('input[name="submit"]').hover( function(){
 		$(this).addClass('btn-info');
 	},
 	function(){
 		$(this).removeClass('btn-info');
 	});
-});
 </script>
