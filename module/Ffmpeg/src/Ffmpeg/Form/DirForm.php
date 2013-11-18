@@ -69,8 +69,6 @@ class dirForm extends Form
 		$this->add(array(
 			'name' => 'submit',
 			'type' => 'Submit',
-			'separator' => '<br />',
-			'decorators' => '<br />',
 			// 'type' => 'Zend\Form\Element\Button',
 			'options' => array(
 				'separator' => '<br />',

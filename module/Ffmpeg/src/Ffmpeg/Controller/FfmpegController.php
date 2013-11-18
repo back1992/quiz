@@ -6,62 +6,10 @@ use Ffmpeg\Form\DirForm;
 use Zend\Stdlib\Hydrator;
 class FfmpegController extends AbstractActionController
 {
-	public function index2Action()
-	{
-		$config = $this->getServiceLocator()->get('Config');
-		$form = new DirForm();
-		$dir = $config['settings']['audiodata'];
-		if( file_exists($dir) ) {
-			$files = $this->dirToArray($dir);
-			krsort($files);
-		}
-		$request = $this->getRequest();
-		if ($request->isPost()) {
-			$forwardPlugin = $this->forward();
-			switch ($request->getPost()->submit)
-			{
-				case 'Convert Mp3 to Ogg':
-				$returnValue = $forwardPlugin->dispatch('Ffmpeg\Controller\Ffmpeg', array(
-					'action' => 'convert'
-					));
-				break;  
-				case 'Split by Silence':
-				$returnValue = $forwardPlugin->dispatch('Ffmpeg\Controller\Ffmpeg', array(
-					'action' => 'splt'
-					));
-				return $returnValue;
-				case 'Edit the Audio':
-				$returnValue = $forwardPlugin->dispatch('Ffmpeg\Controller\Ffmpeg', array(
-					'action' => 'edit'
-					));
-				return $returnValue;
-				break;
-				case 'Fine Tune':
-				$returnValue = $forwardPlugin->dispatch('Ffmpeg\Controller\Ffmpeg', array(
-					'action' => 'fine'
-					));
-				return $returnValue;
-				break;
-				default:
-				return false;
-			}
-		}
-		$view = new ViewModel();
-        // this is not needed since it matches "module/controller/action"
-		// $view->setTemplate('content/article/view');
-		$indexView = new ViewModel(array('form' => $form));
-		$indexView->setTemplate('index');
-		// $filelistView = new ViewModel();
-		$filelistView = new ViewModel(array('files' => $files, 'dir' => $dir));
-		$filelistView->setTemplate('audio/filelist');
-		$view->addChild($indexView, 'index')
-		->addChild($filelistView, 'filelist');
-		return $view;
-		// return array('files' => $files, 'dir' => $dir, 'form' => $form);
-	}
 	public function indexAction()
 	{
-		$config = $this->getServiceLocator()->get('Config');
+		$config = $this->
+getServiceLocator()->get('Config');
 		$form = new DirForm();
 		$dir = $config['settings']['audiodata'];
 		if( file_exists($dir) ) {
@@ -103,7 +51,13 @@ class FfmpegController extends AbstractActionController
 	}
 	public function editAction()
 	{
+				$config = $this->getServiceLocator()->get('Config');
 		$form = new DirForm();
+		$dir = $config['settings']['audiodata'];
+		if( file_exists($dir) ) {
+			$files = $this->dirToArray($dir);
+			krsort($files);
+		}
 		$request = $this->getRequest();
 		if ($request->isPost()) {
 			$audioFile = str_replace('./public/', '/', substr($request->getPost()->title, 0, -4));
@@ -115,7 +69,7 @@ class FfmpegController extends AbstractActionController
 		} 
 				// var_dump($form);
 		// return false;
-		return array('audioFile' => $audioFile, 'form' => $form);
+		return array('files' => $files, 'dir' => $dir,   'audioFile' => $audioFile, 'form' => $form);
 	}
 	public function convertAction()
 	{
@@ -154,12 +108,14 @@ class FfmpegController extends AbstractActionController
 		$logfile = './mp3splt.log';
 		$logArray =  file($logfile);
 		array_splice($logArray,  0, 2);     
-		for ($i=0; $i<count($logArray); $i++) {
+		for ($i=0; $i
+<count($logArray); $i++) {
 			$logArray[$i] = preg_split("/[\s,]+/", $logArray[$i]);
 			array_splice($logArray[$i], 2, 2);
 		}
 		sort ($logArray);
-		$request = $this->getRequest();
+		$request = $this->
+	getRequest();
 		if ($request->isPost()) {
 			$audioFile=str_replace('./public/', '/', substr($request->getPost()->title, 0, -4));
 			var_dump($audioFile);

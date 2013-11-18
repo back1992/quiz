@@ -149,9 +149,12 @@ public function uploadAction(){
             $request->getPost()->toArray(),
             $request->getFiles()->toArray()
             );
-
+var_dump($post);
         $form->setData($post);
+        var_dump($form->setData($post));
+
         if ($form->isValid()) {
+            echo '11111111111111111';
             $data = $form->getData();
             // Form is valid, save the form!
 

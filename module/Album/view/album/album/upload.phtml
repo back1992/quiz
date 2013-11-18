@@ -1,43 +1,68 @@
-<?php
-// module/Album/view/album/album/index.phtml:
+<?php // module/Album/view/album/album/index.phtml:
 $title = 'My Blogs';
-$this->headTitle($title);
-?>
-<h1><?php echo $this->escapeHtml($title); ?></h1>
+$this->headTitle($title); ?>
+<h1>
+	<?php
+	echo $this->escapeHtml($title); ?>
+</h1>
 <p>
 </p>
 <div id="contentarea">
 	<div id="innercontentarea">
-		<h1>Upload Image</h1>
-		<?php if($this->flag): ?>
-			<h3>File Uploaded. Id <?php echo $id; ?> </h3>
-			<p>
-			<a href="<?php echo $this->url('album',  array('action' => 'upload'));?>"> 
+		<h1>
+			Upload Image
+		</h1>
+		<?php
+		if ($this->flag): ?>
+		<h3>
+			File Uploaded. Id
+			<?php
+			echo $id; ?>
+		</h3>
+		<p>
+			<a href="<?php
+			echo $this->url('album', array(
+				'action' => 'upload'
+				)); ?>">
 				Upload another?
 			</a>
-			</p>
-			<p>
-			<a href="<?php echo $this->url('album',  array('action' => 'mp3indb'));?>"> 
+		</p>
+		<p>
+			<a href="<?php
+			echo $this->url('album', array(
+				'action' => 'mp3indb'
+				)); ?>">
 				list Audio file in MongoDB?
 			</a>
-			</p>
-		<?php else: ?>
-			<?php $form->prepare(); // The correct enctype is set here ?>
-			<?php echo $this->form()->openTag($form); ?>
-			<div class="form-element">
-				<?php echo $this->formRow($form->get('caption')).'<br />'; ?>
-				<?php $fileElement = $form->get('image-file'); ?>
-				<?php echo $this->formLabel($fileElement); ?>
-				<?php echo $this->formFile($fileElement); ?>
-				<?php echo $this->formElementErrors($fileElement); ?>
-			</div>
-
-			<button>Submit</button>
-
-			<?php echo $this->form()->closeTag(); ?>
-		<?php endif; ?>
+		</p>
+		<?php
+		else: ?>
+		<?php
+	$form->prepare(); // The correct enctype is set here
+	
+	?>
+	<?php
+	echo $this->form()->openTag($form); ?>
+	<div class="form-element">
+		<?php
+		echo $this->formRow($form->get('caption')) . '
+		<br />
+		'; ?>
+		<?php
+		$fileElement = $form->get('image-file'); ?>
+		<?php
+		echo $this->formLabel($fileElement); ?>
+		<?php
+		echo $this->formFile($fileElement); ?>
+		<?php
+		echo $this->formElementErrors($fileElement); ?>
 	</div>
-
-
+	<button>
+		Submit
+	</button>
+	<?php
+	echo $this->form()->closeTag(); ?>
+	<?php
+	endif; ?>
 </div>
-
+</div>
