@@ -5,15 +5,13 @@ use Zend\Form\Form;
 use Zend\Form\Element\Date;
 use Zend\InputFilter\InputFilter;
 use Zend\Stdlib\Hydrator\ClassMethods as ClassMethodsHydrator;
-class UploadForm extends Form
+class UpdateForm extends Form
 {
     public function __construct
     ($name = null, $options = array())
     {
         parent::__construct('upload-form');
-        $this->
-        setAttribute('method', 'post')
-        ->setHydrator(new ClassMethodsHydrator(false))
+        $this->setHydrator(new ClassMethodsHydrator(false))
         ->setInputFilter(new InputFilter());
         $this->setAttribute('role', 'form');
         $this->addElements();
@@ -22,12 +20,6 @@ class UploadForm extends Form
             'type' => 'Text',
             'options' => array(
                 'label' => 'Quiz Title ',
-                ),
-            'attributes' => array(
-                'class' => 'form-control form-group',
-                'id'=>"quiz-title" ,
-                'style'=>"width: 500px" ,
-                'placeholder'=> 'Quiz Title '
                 ),
             ));
         $this->add(array(
@@ -39,11 +31,6 @@ class UploadForm extends Form
              'value_options' => array(
                  ),
              ),
-         'attributes' => array(
-            'class' => 'form-control form-group prov',
-            'id'=>"prov" ,
-            'style'=>"width: 130px" ,
-            ),
          ));
         $this->add(array(
          'type' => 'Zend\Form\Element\Select',
@@ -54,11 +41,6 @@ class UploadForm extends Form
              'value_options' => array(
                  ),
              ),
-         'attributes' => array(
-            'class' => 'form-control form-group city',
-            'id'=>"city" ,
-            'style'=>"width: 130px" ,
-            ),
          ));
         $this->add(array(
             'name' => 'caption',
@@ -66,20 +48,10 @@ class UploadForm extends Form
             'options' => array(
                 'label' => 'Caption ',
                 ),
-            'attributes' => array(
-                'class' => 'form-control form-group',
-                'id'=>"exampleInputPassword1" ,
-                'style'=>"width: 500px" ,
-                'placeholder'=> 'Caption '
-                ),
             ));
         $this->add(array(
             'name' => 'submit',
             'type' => 'Submit',
-            'attributes' => array(
-                'value' => 'Submit',
-                'class' => 'btn btn-primary form-group',
-                ),
             ));
         $this->add(array(
             'type' => 'Zend\Form\Element\MonthSelect',
