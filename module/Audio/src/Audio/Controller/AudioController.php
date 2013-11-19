@@ -1,4 +1,5 @@
 <?php
+
 namespace Audio\Controller;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
@@ -43,286 +44,309 @@ class AudioController extends AbstractActionController
 				$filename = $data['audio-file']['name'];
 				$mp3file = $tmpfilepath;
 				$gridFS->storeFile($mp3file, array(
-					'audioname' => $filename ,
+					'audioname' => $filename,
 					'filetype' => $filetype,
 					'state' => $post['state'],
 					'city' => $post['city'],
 					'caption' => $caption,
 					'title' => $title,
 					'monthyear' => $monthyear,
-					));
+				));
 				$flag = 1;
-/*				return $this->redirect()->toRoute('audio', array(
+				/*				return $this->redirect()->toRoute('audio', array(
 					'action' => 'audioindb'
 					));*/
-}
-}
-return array(
-	'form' => $form,
-	'flag' => $flag,
-	);
-}
-public function updateAction()
-{
-	ini_set('display_errors', '1');
-	$id = $this->getEvent()->getRouteMatch()->getParam('id');
-	$mongo = DBConnection::instantiate();
-	$gridFS = $mongo->database->getGridFS();
-	$mp3 = $gridFS->findOne(array('_id' => new MongoId($id)));
+			}
+		}
+		
+		return array(
+			'form' => $form,
+			'flag' => $flag,
+		);
+	}
+	public function updateAction()
+	{
+		ini_set('display_errors', '1');
+		$id = $this->getEvent()->getRouteMatch()->getParam('id');
+		$mongo = DBConnection::instantiate();
+		$gridFS = $mongo->database->getGridFS();
+		$mp3 = $gridFS->findOne(array(
+			'_id' => new MongoId($id)
+		));
 		// var_dump($mp3);
-	$form = new UploadForm();
-	$form->setData($mp3->file);
-	var_dump($mp3->file);
+		$form = new UploadForm();
+		$form->setData($mp3->file);
+		var_dump($mp3->file);
 		// var_dump($mp3);
 		// var_dump($form);
-
-	$request = $this->getRequest();
-	if ($request->isPost()) {
+		$request = $this->getRequest();
+		if ($request->isPost()) {
 			// Make certain to merge the files info!
-		$post = array_merge_recursive($request->getPost()->toArray() , $request->getFiles()->toArray());
-		$form->setData($post);
+			$post = array_merge_recursive($request->getPost()->toArray() , $request->getFiles()->toArray());
+			$form->setData($post);
 			// var_dump($post);
-		if ($form->isValid()) {
-			$data = $form->getData();
-			var_dump($data);
-			$filetype = $data['audio-file']['type'];
-			$title = $data['title'];
-			$month = $post['monthyear']['month'];
-			$year = $post['monthyear']['year'];
-			$monthyear = array('month' => $post['monthyear']['month'], 'year' => $post['monthyear']['year']);
-			$tmpfilepath = $data['audio-file']['tmp_name'];
-			$caption = $data['caption'];
-			$filename = $data['audio-file']['name'];
-			$mp3file = $tmpfilepath;
-			$gridFS->update($mp3file, array(
-				'audioname' => $filename ,
-				'filetype' => $filetype,
-				'state' => $post['state'],
-				'city' => $post['city'],
-				'caption' => $caption,
-				'title' => $title,
-				'monthyear' => $monthyear,
+			if ($form->isValid()) {
+				$data = $form->getData();
+				var_dump($data);
+				$filetype = $data['audio-file']['type'];
+				$title = $data['title'];
+				$month = $post['monthyear']['month'];
+				$year = $post['monthyear']['year'];
+				$monthyear = array(
+					'month' => $post['monthyear']['month'],
+					'year' => $post['monthyear']['year']
+				);
+				$tmpfilepath = $data['audio-file']['tmp_name'];
+				$caption = $data['caption'];
+				$filename = $data['audio-file']['name'];
+				$mp3file = $tmpfilepath;
+				$gridFS->update($mp3file, array(
+					'audioname' => $filename,
+					'filetype' => $filetype,
+					'state' => $post['state'],
+					'city' => $post['city'],
+					'caption' => $caption,
+					'title' => $title,
+					'monthyear' => $monthyear,
 				));
-			$flag = 1;
-			return $this->redirect()->toRoute('audio', array(
-				'action' => 'audioindb'
+				$flag = 1;
+				
+				return $this->redirect()->toRoute('audio', array(
+					'action' => 'audioindb'
 				));
+			}
 		}
-	}
-	return array(
-		'id' => $id, 
-		'form' => $form
+		
+		return array(
+			'id' => $id,
+			'form' => $form
 		);
-}
-public function scanAction()
-{
-	$audioDir = './public/audiodata/shandong';
-	$audioArray = scandir($audioDir);
-	array_splice($audioArray, 0, 3);
-		// var_dump($audioArray);
-	foreach ($audioArray as $audioFile) {
-		$tempArr[] = '/audiodata/shandong/' . substr($audioFile, 0, -4);
 	}
-	$audioRes = array_unique($tempArr);
+	public function scanAction()
+	{
+		$audioDir = './public/audiodata/shandong';
+		$audioArray = scandir($audioDir);
+		array_splice($audioArray, 0, 3);
+		// var_dump($audioArray);
+		
+		foreach ($audioArray as $audioFile) {
+			$tempArr[] = '/audiodata/shandong/' . substr($audioFile, 0, -4);
+		}
+		$audioRes = array_unique($tempArr);
 		// var_dump($tempArr);
 		// var_dump($audioRes);
-	if (count($tempArr) == 2 * count($audioRes)) {
-		return array(
-			'audioRes' => $audioRes,
+		if (count($tempArr) == 2 * count($audioRes)) {
+			
+			return array(
+				'audioRes' => $audioRes,
 			);
+		}
+		echo 'something wrong';
+		
+		return false;
 	}
-	echo 'something wrong';
-	return false;
-}
-public function audioindbAction()
-{
-	ini_set('display_errors', '1');
-	$mongo = DBConnection::instantiate();
-	$gridFS = $mongo->database->getGridFS();
-	$objects = $gridFS->find();
-		// var_dump($objects);
-	$form = array();
-		// for ($i=0; $i<$objects->length; $i++)
-	$i = 0;
-	foreach ($objects as $object) 
+	public function audioindbAction()
 	{
-		// var_dump($object->file);
-		$form[$i] = new UpdateForm();
-		$form[$i]->setData($object->file);
-		// echo $i.'<br />';
-		$i++;
-	}
-
+		ini_set('display_errors', '1');
+		$mongo = DBConnection::instantiate();
+		$gridFS = $mongo->database->getGridFS();
+		$objects = $gridFS->find();
+		// var_dump($objects);
+		$form = array();
+		// for ($i=0; $i<$objects->length; $i++)
+		$i = 0;
+		
+		foreach ($objects as $object) {
+			// var_dump($object->file);
+			$form[$i] = new UpdateForm();
+			$form[$i]->setData($object->file);
+			// echo $i.'<br />';
+			$i++;
+		}
 		// return false;
-	return array(
-		'form' => $form,
-		'flashMessages' => $this->flashMessenger()->getMessages()
+		
+		return array(
+			'form' => $form,
+			'flashMessages' => $this->flashMessenger()->getMessages()
 		);
-}
-public function audioindb2Action()
-{
-	ini_set('display_errors', '1');
-	$mongo = DBConnection::instantiate();
-	$gridFS = $mongo->database->getGridFS();
-	$objects = $gridFS->find();
-	return array(
-		'objects' => $objects,
-		'flashMessages' => $this->flashMessenger()->getMessages()
-		);
-}
-public function fetchaudioAction()
-{
-	ini_set('display_errors', '1');
-	$id = $this->getEvent()->getRouteMatch()->getParam('id');
-	if (!$id) {
-		$this->flashMessenger()->addMessage('You havn\'t select audio file in database .');
-		return $this->redirect()->toRoute('audio', array(
-			'action' => 'audioindb'
-			));
 	}
-	$mongo = DBConnection::instantiate();
-	$dbname = DBConnection::DBNAME;
-	$gridFS = $mongo->database->getGridFS();
-	$object = $gridFS->findOne(array(
-		'_id' => new MongoId($id)
+	public function audioindb2Action()
+	{
+		ini_set('display_errors', '1');
+		$mongo = DBConnection::instantiate();
+		$gridFS = $mongo->database->getGridFS();
+		$objects = $gridFS->find();
+		
+		return array(
+			'objects' => $objects,
+			'flashMessages' => $this->flashMessenger()->getMessages()
+		);
+	}
+	public function fetchaudioAction()
+	{
+		ini_set('display_errors', '1');
+		$id = $this->getEvent()->getRouteMatch()->getParam('id');
+		if (!$id) {
+			$this->flashMessenger()->addMessage('You havn\'t select audio file in database .');
+			
+			return $this->redirect()->toRoute('audio', array(
+				'action' => 'audioindb'
+			));
+		}
+		$mongo = DBConnection::instantiate();
+		$dbname = DBConnection::DBNAME;
+		$gridFS = $mongo->database->getGridFS();
+		$object = $gridFS->findOne(array(
+			'_id' => new MongoId($id)
 		));
-	var_dump($object);
-	$formdata = new ArrayObject;
-	$formdata['title'] = $object['title'];
+		var_dump($object);
+		$formdata = new ArrayObject;
+		$formdata['title'] = $object['title'];
 		//view in form
-	$form = new audioForm();
-	$form->setBindOnValidate(false);
-	$form->bind($formdata);
-	$audiofiledir = './public/audiodata/raw/';
-	$form->setData(array(
-		'audiofiledir' => $audiofiledir
+		$form = new audioForm();
+		$form->setBindOnValidate(false);
+		$form->bind($formdata);
+		$audiofiledir = './public/audiodata/raw/';
+		$form->setData(array(
+			'audiofiledir' => $audiofiledir
 		));
 		// var_dump((object)$object->file);
 		//write to raw directory
-	$audioname = $object['audio-file']['audioname'];
-	$object->write($audiofiledir . $audioname);
-	$this->flashMessenger()->addMessage("You have fetch audio file  '$audioname' into  '$audiofiledir' .");
-	return array(
-		'form' => $form,
-		'flashMessages' => $this->flashMessenger()->getMessages()
+		$audioname = $object['audio-file']['audioname'];
+		$object->write($audiofiledir . $audioname);
+		$this->flashMessenger()->addMessage("You have fetch audio file  '$audioname' into  '$audiofiledir' .");
+		
+		return array(
+			'form' => $form,
+			'flashMessages' => $this->flashMessenger()->getMessages()
 		);
-}
-public function editAction()
-{
-}
-public function deleteAction()
-{
-	ini_set('display_errors', '1');
-	$mongo = DBConnection::instantiate();
-	$gridFS = $mongo->database->getGridFS();
-	$id = $this->getEvent()->getRouteMatch()->getParam('id');
-	if ($id == 'all') {
-		$gridFS->remove();
 	}
-	else {
-		$gridFS->remove(array(
-			'_id' => new MongoId($id)
+	public function editAction()
+	{
+	}
+	public function deleteAction()
+	{
+		ini_set('display_errors', '1');
+		$mongo = DBConnection::instantiate();
+		$gridFS = $mongo->database->getGridFS();
+		$id = $this->getEvent()->getRouteMatch()->getParam('id');
+		if ($id == 'all') {
+			$gridFS->remove();
+		}
+		else {
+			$gridFS->remove(array(
+				'_id' => new MongoId($id)
 			));
-	}
-	$this->redirect()->toRoute('audio', array(
-		'action' => 'audioindb'
+		}
+		$this->redirect()->toRoute('audio', array(
+			'action' => 'audioindb'
 		));
-}
-public function viewAction()
-{
-	define("DETAIL", 5);
-	define("DEFAULT_WIDTH", 500);
-	define("DEFAULT_HEIGHT", 100);
-	define("DEFAULT_FOREGROUND", "#FF0000");
-	define("DEFAULT_BACKGROUND", "#FFFFFF");
+	}
+	public function viewAction()
+	{
+		define("DETAIL", 5);
+		define("DEFAULT_WIDTH", 500);
+		define("DEFAULT_HEIGHT", 100);
+		define("DEFAULT_FOREGROUND", "#FF0000");
+		define("DEFAULT_BACKGROUND", "#FFFFFF");
 		// get user vars from form
-	$width = DEFAULT_WIDTH;
-	$height = DEFAULT_HEIGHT;
-	$foreground = DEFAULT_FOREGROUND;
-	$background = DEFAULT_BACKGROUND;
-	$draw_flat = true;
-	$img = false;
-	list($r, $g, $b) = $this->html2rgb($foreground);
-	$filename = './2632831d77.wav';
-	$handle = fopen($filename, "r");
+		$width = DEFAULT_WIDTH;
+		$height = DEFAULT_HEIGHT;
+		$foreground = DEFAULT_FOREGROUND;
+		$background = DEFAULT_BACKGROUND;
+		$draw_flat = true;
+		$img = false;
+		list($r, $g, $b) = $this->html2rgb($foreground);
+		$filename = './2632831d77.wav';
+		$handle = fopen($filename, "r");
 		// wav file header retrieval
-	$heading[] = fread($handle, 4);
-	$heading[] = bin2hex(fread($handle, 4));
-	$heading[] = fread($handle, 4);
-	$heading[] = fread($handle, 4);
-	$heading[] = bin2hex(fread($handle, 4));
-	$heading[] = bin2hex(fread($handle, 2));
-	$heading[] = bin2hex(fread($handle, 2));
-	$heading[] = bin2hex(fread($handle, 4));
-	$heading[] = bin2hex(fread($handle, 4));
-	$heading[] = bin2hex(fread($handle, 2));
-	$heading[] = bin2hex(fread($handle, 2));
-	$heading[] = fread($handle, 4);
-	$heading[] = bin2hex(fread($handle, 4));
+		$heading[] = fread($handle, 4);
+		$heading[] = bin2hex(fread($handle, 4));
+		$heading[] = fread($handle, 4);
+		$heading[] = fread($handle, 4);
+		$heading[] = bin2hex(fread($handle, 4));
+		$heading[] = bin2hex(fread($handle, 2));
+		$heading[] = bin2hex(fread($handle, 2));
+		$heading[] = bin2hex(fread($handle, 4));
+		$heading[] = bin2hex(fread($handle, 4));
+		$heading[] = bin2hex(fread($handle, 2));
+		$heading[] = bin2hex(fread($handle, 2));
+		$heading[] = fread($handle, 4);
+		$heading[] = bin2hex(fread($handle, 4));
 		// wav bitrate
-	$peek = hexdec(substr($heading[10], 0, 2));
-	$byte = $peek / 8;
+		$peek = hexdec(substr($heading[10], 0, 2));
+		$byte = $peek / 8;
 		// checking whether a mono or stereo wav
-	$channel = hexdec(substr($heading[6], 0, 2));
-	$ratio = ($channel == 2 ? 40 : 80);
-	$data_size = floor((filesize($filename) - 44) / ($ratio + $byte) + 1);
-	$data_point = 0;
-	$img = imagecreatetruecolor($data_size / DETAIL, $height);
-	imagesavealpha($img, true);
-	$transparentColor = imagecolorallocatealpha($img, 0, 0, 0, 127);
-	imagefill($img, 0, 0, $transparentColor);
-	while (!feof($handle) && $data_point < $data_size) {
-		if ($data_point++ % DETAIL == 0) {
-			$bytes = array();
+		$channel = hexdec(substr($heading[6], 0, 2));
+		$ratio = ($channel == 2 ? 40 : 80);
+		$data_size = floor((filesize($filename) - 44) / ($ratio + $byte) + 1);
+		$data_point = 0;
+		$img = imagecreatetruecolor($data_size / DETAIL, $height);
+		imagesavealpha($img, true);
+		$transparentColor = imagecolorallocatealpha($img, 0, 0, 0, 127);
+		imagefill($img, 0, 0, $transparentColor);
+		
+		while (!feof($handle) && $data_point < $data_size) {
+			if ($data_point++ % DETAIL == 0) {
+				$bytes = array();
 				// get number of bytes depending on bitrate
-			for ($i = 0; $i < $byte; $i++) $bytes[$i] = fgetc($handle);
+				
+				for ($i = 0; $i < $byte; $i++) $bytes[$i] = fgetc($handle);
+				
 				switch ($byte) {
 						// get value for 8-bit wav
+						
+						
 					case 1:
-					$data = findValues($bytes[0], $bytes[1]);
-					break;
+						$data = findValues($bytes[0], $bytes[1]);
+						
+						break;
 						// get value for 16-bit wav
+						
+						
 					case 2:
-					if (ord($bytes[1]) & 128) $temp = 0;
-					else $temp = 128;
-					$temp = chr((ord($bytes[1]) & 127) + $temp);
-					$data = floor($this->findValues($bytes[0], $temp) / 256);
-					break;
-				}
+						if (ord($bytes[1]) & 128) $temp = 0;
+						else $temp = 128;
+						$temp = chr((ord($bytes[1]) & 127) + $temp);
+						$data = floor($this->findValues($bytes[0], $temp) / 256);
+						
+						break;
+					}
 					// skip bytes for memory optimization
-				fseek($handle, $ratio, SEEK_CUR);
+					fseek($handle, $ratio, SEEK_CUR);
 					// draw this data point
 					// relative value based on height of image being generated
 					// data values can range between 0 and 255
-				$v = (int)($data / 255 * $height);
+					$v = (int)($data / 255 * $height);
 					// don't print flat values on the canvas if not necessary
-				if (!($v / $height == 0.5 && !$draw_flat))
+					if (!($v / $height == 0.5 && !$draw_flat))
 					// draw the line on the image using the $v value and centering it vertically on the canvas
 					imageline($img,
 					// x1
-						(int)($data_point / DETAIL) ,
+					(int)($data_point / DETAIL) ,
 					// y1: height of the image minus $v as a percentage of the height for the wave amplitude
-						$height - $v,
+					$height - $v,
 					// x2
-						(int)($data_point / DETAIL) ,
+					(int)($data_point / DETAIL) ,
 					// y2: same as y1, but from the bottom of the image
-						$height - ($height - $v) , imagecolorallocate($img, $r, $g, $b));
-			}
-			else {
+					$height - ($height - $v) , imagecolorallocate($img, $r, $g, $b));
+				}
+				else {
 					// skip this one due to lack of detail
-				fseek($handle, $ratio + $byte, SEEK_CUR);
+					fseek($handle, $ratio + $byte, SEEK_CUR);
+				}
 			}
-		}
 			// close and cleanup
-		fclose($handle);
+			fclose($handle);
 			// delete the processed wav file
 			// unlink($filename);
 			// header("Content-Type: image/png");
-		var_dump($img);
-		imagejpeg($img, 'simpletext.jpg');
-		imagepng($img);
-		imagedestroy($img);
-		return false;
+			var_dump($img);
+			imagejpeg($img, 'simpletext.jpg');
+			imagepng($img);
+			imagedestroy($img);
+			
+			return false;
 	}
 	public function imageAction()
 	{
@@ -345,6 +369,7 @@ public function viewAction()
 		header('Content-Type: image/png');
 		imagepng($png);
 		imagedestroy($png);
+		
 		return false;
 	}
 	public function readlogAction()
@@ -352,38 +377,49 @@ public function viewAction()
 		$logfile = './mp3splt.log';
 		$logArray = file($logfile);
 		array_splice($logArray, 0, 2);
+		
 		for ($i = 0; $i < count($logArray); $i++) {
 			$logArray[$i] = preg_split("/[\s,]+/", $logArray[$i]);
 			array_splice($logArray[$i], 2, 2);
 		}
 		sort($logArray);
+		
 		return array(
 			'logArray' => $logArray,
-			);
+		);
 	}
 	public function insertdbAction()
 	{
 		ini_set('display_errors', '1');
-		
 		$mongo = DBConnection::instantiate();
 		$collection = $mongo->getCollection('dandan');
 		// Convert JSON to a PHP array
 		$file = file_get_contents('./public/js/cityselect/city.min.js', FILE_USE_INCLUDE_PATH);
-		var_dump($file);
-		$citylist = json_decode($file);
-
-// Loop array and create seperate documents for each tweet
-		foreach ($citylist as $id => $item) {
-			$collection->insert($item);
+		// var_dump($file);
+		// echo $file;
+		$citylist = json_decode($file, true);
+		echo '<pre>';
+		// Loop array and create seperate documents for each tweet
+		// print_r($citylist);
+	
+		// var_dump($citylist);
+		foreach ($citylist as $key => $values) {
+			foreach ($values as $key1 => $value) {
+				// var_dump($value);
+				 $collection->insert($value);
+			}
+			# code...
 		}
-// $collection->insert($myjson)
-		return FALSE;
-
+		// $collection->insert($myjson)
+			echo '</pre>';
+		return false;
+		// return $citylist;
 	}
 	function findValues($byte1, $byte2)
 	{
 		$byte1 = hexdec(bin2hex($byte1));
 		$byte2 = hexdec(bin2hex($byte2));
+		
 		return ($byte1 + ($byte2 * 256));
 	}
 	/**
@@ -399,6 +435,6 @@ public function viewAction()
 			hexdec(substr($input, 0, 2)) ,
 			hexdec(substr($input, 2, 2)) ,
 			hexdec(substr($input, 4, 2))
-			);
+		);
 	}
 }
