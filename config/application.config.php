@@ -9,9 +9,6 @@ return array(
     'modules' => array(
         'ZendDeveloperTools',
         'DoctrineModule',
-        // 'DoctrineMongoODMModule',
-        // 'DluTwBootstrap',
-        // 'DluTwBootstrapDemo',
         'Application',
         'Album',
         'Mp3',

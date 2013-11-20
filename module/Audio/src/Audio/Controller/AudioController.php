@@ -53,26 +53,82 @@ class AudioController extends AbstractActionController
 					'monthyear' => $monthyear,
 				));
 				$flag = 1;
-				/*				return $this->redirect()->toRoute('audio', array(
+				return $this->redirect()->toRoute('audio', array(
 					'action' => 'audioindb'
-					));*/
+					));
 			}
 		}
-		
 		return array(
 			'form' => $form,
 			'flag' => $flag,
-		);
+			);
 	}
 	public function updateAction()
+	{
+		ini_set('display_errors', '1');
+		// require_once 'vendor/zendframework/zendframework/library/Zend/Loader/StandardAutoloader.php';
+		// /quiz/vendor/zendframework/zendframework/library/Zend/Loader/StandardAutoloader.php
+/*require_once 'Zend/Loader/ClassMapAutoloader.php';
+$loader = new \Zend\Loader\ClassMapAutoloader();
+
+// Register the class map:
+$loader->registerAutoloadMap('./vendor/dandan/autoload_classmap.php');
+// /quiz/vendor/dandan/autoload_classmap.php
+// Register with spl_autoload:
+// $loader->register();
+var_dump($loader->register());*/
+
+require_once './vendor/dandan/library/Dandan/Dandan.php';
+		$id = $this->getEvent()->getRouteMatch()->getParam('id');
+		$mongo = DBConnection::instantiate();
+		$gridFS = $mongo->database->getGridFS();
+		$mp3 = $gridFS->findOne(array('_id' => new MongoId($id)));
+		// var_dump($mp3);
+		$form = new UploadForm();
+		$form->setData($mp3->file);
+		// var_dump($mp3->file);
+
+		$t = new Dandan();
+
+		$files = $t->dirToArray($dir);
+		// var_dump($mp3);
+		// var_dump($form);
+		$request = $this->getRequest();
+		if ($request->isPost()) {
+			// Make certain to merge the files info!
+			$post = array_merge_recursive($request->getPost()->toArray() , $request->getFiles()->toArray());
+			$form->setData($post);
+			// var_dump($post);
+			if ($form->isValid()) {
+				$data = $form->getData();
+				// var_dump($data);
+				$filetype = $data['audio-file']['type'];
+				$title = $data['title'];
+				$filename = $data['audio-file']['name'];
+				$mp3file = $tmpfilepath;
+				$gridFS->update($mp3file, array(
+					'audioname' => $filename ,
+					'filetype' => $data['audio-file']['type'],
+					'title' => $title,
+					));
+				$flag = 1;
+				return $this->redirect()->toRoute('audio', array(
+					'action' => 'audioindb'
+					));
+			}
+		}
+		return array(
+			'id' => $id, 
+			'form' => $form
+			);
+	}
+	public function update2Action()
 	{
 		ini_set('display_errors', '1');
 		$id = $this->getEvent()->getRouteMatch()->getParam('id');
 		$mongo = DBConnection::instantiate();
 		$gridFS = $mongo->database->getGridFS();
-		$mp3 = $gridFS->findOne(array(
-			'_id' => new MongoId($id)
-		));
+		$mp3 = $gridFS->findOne(array('_id' => new MongoId($id)));
 		// var_dump($mp3);
 		$form = new UploadForm();
 		$form->setData($mp3->file);
@@ -92,35 +148,31 @@ class AudioController extends AbstractActionController
 				$title = $data['title'];
 				$month = $post['monthyear']['month'];
 				$year = $post['monthyear']['year'];
-				$monthyear = array(
-					'month' => $post['monthyear']['month'],
-					'year' => $post['monthyear']['year']
-				);
+				$monthyear = array('month' => $post['monthyear']['month'], 'year' => $post['monthyear']['year']);
 				$tmpfilepath = $data['audio-file']['tmp_name'];
 				$caption = $data['caption'];
 				$filename = $data['audio-file']['name'];
 				$mp3file = $tmpfilepath;
 				$gridFS->update($mp3file, array(
-					'audioname' => $filename,
+					'audioname' => $filename ,
 					'filetype' => $filetype,
 					'state' => $post['state'],
 					'city' => $post['city'],
 					'caption' => $caption,
 					'title' => $title,
 					'monthyear' => $monthyear,
-				));
+					));
 				$flag = 1;
-				
 				return $this->redirect()->toRoute('audio', array(
 					'action' => 'audioindb'
-				));
+					));
 			}
 		}
-		
 		return array(
-			'id' => $id,
+			'id' => $id, 
 			'form' => $form
-		);
+			);
+>>>>>>> b5aa347a5ccaa42ebaaf0d62a5b1939080e2b51c
 	}
 	public function scanAction()
 	{
@@ -128,7 +180,6 @@ class AudioController extends AbstractActionController
 		$audioArray = scandir($audioDir);
 		array_splice($audioArray, 0, 3);
 		// var_dump($audioArray);
-		
 		foreach ($audioArray as $audioFile) {
 			$tempArr[] = '/audiodata/shandong/' . substr($audioFile, 0, -4);
 		}
@@ -136,16 +187,14 @@ class AudioController extends AbstractActionController
 		// var_dump($tempArr);
 		// var_dump($audioRes);
 		if (count($tempArr) == 2 * count($audioRes)) {
-			
 			return array(
 				'audioRes' => $audioRes,
-			);
+				);
 		}
 		echo 'something wrong';
-		
 		return false;
 	}
-	public function audioindbAction()
+	public function audioeditindbAction()
 	{
 		ini_set('display_errors', '1');
 		$mongo = DBConnection::instantiate();
@@ -155,32 +204,30 @@ class AudioController extends AbstractActionController
 		$form = array();
 		// for ($i=0; $i<$objects->length; $i++)
 		$i = 0;
-		
-		foreach ($objects as $object) {
-			// var_dump($object->file);
+		foreach ($objects as $object) 
+		{
+		// var_dump($object->file);
 			$form[$i] = new UpdateForm();
 			$form[$i]->setData($object->file);
-			// echo $i.'<br />';
+		// echo $i.'<br />';
 			$i++;
 		}
 		// return false;
-		
 		return array(
 			'form' => $form,
 			'flashMessages' => $this->flashMessenger()->getMessages()
-		);
+			);
 	}
-	public function audioindb2Action()
+	public function audioindbAction()
 	{
 		ini_set('display_errors', '1');
 		$mongo = DBConnection::instantiate();
 		$gridFS = $mongo->database->getGridFS();
 		$objects = $gridFS->find();
-		
 		return array(
 			'objects' => $objects,
 			'flashMessages' => $this->flashMessenger()->getMessages()
-		);
+			);
 	}
 	public function fetchaudioAction()
 	{
@@ -188,38 +235,35 @@ class AudioController extends AbstractActionController
 		$id = $this->getEvent()->getRouteMatch()->getParam('id');
 		if (!$id) {
 			$this->flashMessenger()->addMessage('You havn\'t select audio file in database .');
-			
 			return $this->redirect()->toRoute('audio', array(
 				'action' => 'audioindb'
-			));
+				));
 		}
 		$mongo = DBConnection::instantiate();
 		$dbname = DBConnection::DBNAME;
 		$gridFS = $mongo->database->getGridFS();
 		$object = $gridFS->findOne(array(
 			'_id' => new MongoId($id)
-		));
-		var_dump($object);
-		$formdata = new ArrayObject;
-		$formdata['title'] = $object['title'];
-		//view in form
-		$form = new audioForm();
-		$form->setBindOnValidate(false);
-		$form->bind($formdata);
+			));
+		$form = new updateForm();
+		// $form->setBindOnValidate(false);
+		// $form->bind($audioObject);
+		$form->setData($object->file);
+		// var_dump($form->bind($audioObject));
 		$audiofiledir = './public/audiodata/raw/';
+		// var_dump($form);
 		$form->setData(array(
 			'audiofiledir' => $audiofiledir
-		));
-		// var_dump((object)$object->file);
-		//write to raw directory
-		$audioname = $object['audio-file']['audioname'];
+			));
+		// write to raw directory
+		$audioname = $object->file['audioname'];
+		echo $audiofiledir . $audioname;
 		$object->write($audiofiledir . $audioname);
 		$this->flashMessenger()->addMessage("You have fetch audio file  '$audioname' into  '$audiofiledir' .");
-		
 		return array(
 			'form' => $form,
 			'flashMessages' => $this->flashMessenger()->getMessages()
-		);
+			);
 	}
 	public function editAction()
 	{
@@ -236,11 +280,11 @@ class AudioController extends AbstractActionController
 		else {
 			$gridFS->remove(array(
 				'_id' => new MongoId($id)
-			));
+				));
 		}
 		$this->redirect()->toRoute('audio', array(
 			'action' => 'audioindb'
-		));
+			));
 	}
 	public function viewAction()
 	{
@@ -285,31 +329,22 @@ class AudioController extends AbstractActionController
 		imagesavealpha($img, true);
 		$transparentColor = imagecolorallocatealpha($img, 0, 0, 0, 127);
 		imagefill($img, 0, 0, $transparentColor);
-		
 		while (!feof($handle) && $data_point < $data_size) {
 			if ($data_point++ % DETAIL == 0) {
 				$bytes = array();
 				// get number of bytes depending on bitrate
-				
 				for ($i = 0; $i < $byte; $i++) $bytes[$i] = fgetc($handle);
-				
-				switch ($byte) {
+					switch ($byte) {
 						// get value for 8-bit wav
-						
-						
-					case 1:
+						case 1:
 						$data = findValues($bytes[0], $bytes[1]);
-						
 						break;
 						// get value for 16-bit wav
-						
-						
-					case 2:
+						case 2:
 						if (ord($bytes[1]) & 128) $temp = 0;
 						else $temp = 128;
 						$temp = chr((ord($bytes[1]) & 127) + $temp);
 						$data = floor($this->findValues($bytes[0], $temp) / 256);
-						
 						break;
 					}
 					// skip bytes for memory optimization
@@ -321,15 +356,15 @@ class AudioController extends AbstractActionController
 					// don't print flat values on the canvas if not necessary
 					if (!($v / $height == 0.5 && !$draw_flat))
 					// draw the line on the image using the $v value and centering it vertically on the canvas
-					imageline($img,
+						imageline($img,
 					// x1
-					(int)($data_point / DETAIL) ,
+							(int)($data_point / DETAIL) ,
 					// y1: height of the image minus $v as a percentage of the height for the wave amplitude
-					$height - $v,
+							$height - $v,
 					// x2
-					(int)($data_point / DETAIL) ,
+							(int)($data_point / DETAIL) ,
 					// y2: same as y1, but from the bottom of the image
-					$height - ($height - $v) , imagecolorallocate($img, $r, $g, $b));
+							$height - ($height - $v) , imagecolorallocate($img, $r, $g, $b));
 				}
 				else {
 					// skip this one due to lack of detail
@@ -345,83 +380,67 @@ class AudioController extends AbstractActionController
 			imagejpeg($img, 'simpletext.jpg');
 			imagepng($img);
 			imagedestroy($img);
-			
 			return false;
-	}
-	public function imageAction()
-	{
-		header('Content-Type: image/png');
-		$im = @imagecreatetruecolor(120, 20) or die('Cannot Initialize new GD image stream');
-		$text_color = imagecolorallocate($im, 233, 14, 91);
-		imagestring($im, 1, 5, 5, 'A Simple Text String', $text_color);
-		imagepng($im);
-		imagedestroy($im);
-	}
-	public function imagealphaAction()
-	{
+		}
+		public function imageAction()
+		{
+			header('Content-Type: image/png');
+			$im = @imagecreatetruecolor(120, 20) or die('Cannot Initialize new GD image stream');
+			$text_color = imagecolorallocate($im, 233, 14, 91);
+			imagestring($im, 1, 5, 5, 'A Simple Text String', $text_color);
+			imagepng($im);
+			imagedestroy($im);
+		}
+		public function imagealphaAction()
+		{
 		// 载入带 alpha 通道的 png 图像
-		$png = imagecreatefrompng('./public/img/zf2-logo.png');
+			$png = imagecreatefrompng('./public/img/zf2-logo.png');
 		// 做些必须的操作
 		// 关闭 alpha 渲染并设置 alpha 标志
-		imagealphablending($png, false);
-		imagesavealpha($png, true);
+			imagealphablending($png, false);
+			imagesavealpha($png, true);
 		// 输出图像到浏览器
-		header('Content-Type: image/png');
-		imagepng($png);
-		imagedestroy($png);
-		
-		return false;
-	}
-	public function readlogAction()
-	{
-		$logfile = './mp3splt.log';
-		$logArray = file($logfile);
-		array_splice($logArray, 0, 2);
-		
-		for ($i = 0; $i < count($logArray); $i++) {
-			$logArray[$i] = preg_split("/[\s,]+/", $logArray[$i]);
-			array_splice($logArray[$i], 2, 2);
+			header('Content-Type: image/png');
+			imagepng($png);
+			imagedestroy($png);
+			return false;
 		}
-		sort($logArray);
-		
-		return array(
-			'logArray' => $logArray,
-		);
-	}
-	public function insertdbAction()
-	{
-		ini_set('display_errors', '1');
-		$mongo = DBConnection::instantiate();
-		$collection = $mongo->getCollection('dandan');
-		// Convert JSON to a PHP array
-		$file = file_get_contents('./public/js/cityselect/city.min.js', FILE_USE_INCLUDE_PATH);
-		// var_dump($file);
-		// echo $file;
-		$citylist = json_decode($file, true);
-		echo '<pre>';
-		// Loop array and create seperate documents for each tweet
-		// print_r($citylist);
-	
-		// var_dump($citylist);
-		foreach ($citylist as $key => $values) {
-			foreach ($values as $key1 => $value) {
-				// var_dump($value);
-				 $collection->insert($value);
+		public function readlogAction()
+		{
+			$logfile = './mp3splt.log';
+			$logArray = file($logfile);
+			array_splice($logArray, 0, 2);
+			for ($i = 0; $i < count($logArray); $i++) {
+				$logArray[$i] = preg_split("/[\s,]+/", $logArray[$i]);
+				array_splice($logArray[$i], 2, 2);
 			}
-			# code...
+			sort($logArray);
+			return array(
+				'logArray' => $logArray,
+				);
 		}
-		// $collection->insert($myjson)
-			echo '</pre>';
-		return false;
-		// return $citylist;
-	}
-	function findValues($byte1, $byte2)
-	{
-		$byte1 = hexdec(bin2hex($byte1));
-		$byte2 = hexdec(bin2hex($byte2));
-		
-		return ($byte1 + ($byte2 * 256));
-	}
+		public function insertdbAction()
+		{
+			ini_set('display_errors', '1');
+			$mongo = DBConnection::instantiate();
+			$collection = $mongo->getCollection('dandan');
+		// Convert JSON to a PHP array
+			$file = file_get_contents('./public/js/cityselect/city.min.js', FILE_USE_INCLUDE_PATH);
+			var_dump($file);
+			$citylist = json_decode($file);
+// Loop array and create seperate documents for each tweet
+			foreach ($citylist as $id => $item) {
+				$collection->insert($item);
+			}
+// $collection->insert($myjson)
+			return FALSE;
+		}
+		function findValues($byte1, $byte2)
+		{
+			$byte1 = hexdec(bin2hex($byte1));
+			$byte2 = hexdec(bin2hex($byte2));
+			return ($byte1 + ($byte2 * 256));
+		}
 	/**
 	 * Great function slightly modified as posted by Minux at
 	 * http://forums.clantemplates.com/showthread.php?t=133805
