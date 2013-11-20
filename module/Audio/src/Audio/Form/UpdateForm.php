@@ -13,7 +13,8 @@ class UpdateForm extends Form
         parent::__construct('upload-form');
         $this->setHydrator(new ClassMethodsHydrator(false))
         ->setInputFilter(new InputFilter());
-        $this->setAttribute('role', 'form');
+        $this->setAttribute('role','form');
+        // $this->setAttribute('class','form-horizontal');
         $this->addElements();
         $this->add(array(
             'name' => 'title',
@@ -23,25 +24,32 @@ class UpdateForm extends Form
                 ),
             ));
         $this->add(array(
-         'type' => 'Zend\Form\Element\Select',
-         'name' => 'state',
-         'options' => array(
-             'label' => 'State: ',
-             'empty_option' => 'state',
-             'value_options' => array(
-                 ),
-             ),
-         ));
+            'name' => 'audioname',
+            'type' => 'Text',
+            'options' => array(
+                'label' => 'Audio Name ',
+                ),
+            ));
         $this->add(array(
-         'type' => 'Zend\Form\Element\Select',
-         'name' => 'city',
-         'options' => array(
-             'label' => 'City',
-             'empty_option' => 'City',
-             'value_options' => array(
-                 ),
-             ),
-         ));
+           'type' => 'Zend\Form\Element\Select',
+           'name' => 'state',
+           'options' => array(
+               'label' => 'State: ',
+               'empty_option' => 'state',
+               'value_options' => array(
+                   ),
+               ),
+           ));
+        $this->add(array(
+           'type' => 'Zend\Form\Element\Select',
+           'name' => 'city',
+           'options' => array(
+               'label' => 'City',
+               'empty_option' => 'City',
+               'value_options' => array(
+                   ),
+               ),
+           ));
         $this->add(array(
             'name' => 'caption',
             'type' => 'Text',
@@ -52,6 +60,10 @@ class UpdateForm extends Form
         $this->add(array(
             'name' => 'submit',
             'type' => 'Submit',
+            'attributes' => array(
+                'value' => 'Submit',
+                'class' => 'btn btn-default',
+                ),
             ));
         $this->add(array(
             'type' => 'Zend\Form\Element\MonthSelect',
@@ -59,6 +71,20 @@ class UpdateForm extends Form
             'options' => array(
                 'label' => 'Select a month and a year',
                 'min_year' => 1986,
+                ),
+            ));
+        $this->add(array(
+            'name' => 'audiofilepath',
+            'type' => 'Text',
+            'options' => array(
+                'label' => 'Audiofilepath ',
+                ),
+            ));
+        $this->add(array(
+            'name' => 'audiofiledir',
+            'type' => 'Text',
+            'options' => array(
+                'label' => 'Audiofiledir ',
                 ),
             ));
     }

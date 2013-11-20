@@ -1,9 +1,13 @@
 <?php
 // module/Album/view/album/album/index.phtml:
+ini_set('display_errors', '1');
+
 $title = 'My Blogs';
 $this->headTitle($title);
 ?>
 <h1><?php echo $this->escapeHtml($title); ?></h1>
+<p>
+</p>
 <div id="contentarea">
 	<div id="innercontentarea">
 		<?php if(count($flashMessages)) : ?>
@@ -27,27 +31,66 @@ $this->headTitle($title);
 				</tr>
 			</thead>
 			<tbody>
-				<?php
-				for ($i=0; $i < count($this->form); $i++) { 
-					echo $this->partial('partial/audio/update.phtml', array(
-						'form' => $this->form[$i],
-						'i' => $i));
-					}
-					?>
-				</tbody>
-			</table>
-			<p>
-				<a href="<?php echo $this->url('audio',  array('action' => 'upload'));?>"  class="btn btn-default" role="button"> 
-					Upload another?
-				</a>
-			</p>	
-			<p>
-				<a href="<?php echo $this->url('audio',  array('action' => 'delete','id' => 'all'));?>"  class="btn btn-danger" role="button"> 
-					Delete All
-				</a>
-			</p>
-		</div>
-
-
+					<?php $i = 1; ?>
+				<?php while($object = $objects->getNext()): ?> 
+					<tr>
+						<td>
+							<?php echo 'No.'.$i;?>
+						</td>
+						<td>
+							<?php echo implode("/",$object->file['monthyear']);?>
+						</td>
+						<td>
+							<?php echo $object->file['state'];?>
+						</td>
+						<td>
+							<?php echo $object->file['city'];?>
+						</td>
+						<td>
+							<?php echo $object->file['title'];?>
+						</td>
+						<td>
+							<?php echo $object->file['audioname'];?>
+						</td>
+						<td >
+							<?php echo ceil($object->file['length'] /
+							1024).' KB';?>
+						</td>
+						<td>
+							<a href="<?php echo $this->url('audio',  array('action' => 'fetchaudio','id'
+								=> $object->file['_id']->__toString()));?>" class="btn btn-default" role="button"> 
+								Fetch
+							</a>
+							<a href="<?php echo $this->url('audio',  array('action' => 'update','id'
+								=> $object->file['_id']->__toString()));?>" class="btn btn-success" role="button"> 
+								Edit
+							</a>
+							<a href="<?php echo $this->url('audio',  array('action' => 'splt','id'
+								=> $object->file['_id']->__toString()));?>" class="btn btn-info" role="button"> 
+								Splt
+							</a>
+							<a href="<?php echo $this->url('audio',  array('action' => 'delete','id'
+								=> $object->file['_id']->__toString()));?>" class="btn btn-warning" role="button"> 
+								Delete
+							</a>
+						</td>
+					</tr>
+					<?php $i++ ?>
+				<?php endwhile;?>
+			</tbody>
+		</table>
+		<p>
+			<a href="<?php echo $this->url('audio',  array('action' => 'upload'));?>"  class="btn btn-default" role="button"> 
+				Upload another?
+			</a>
+		</p>	
+		<p>
+			<a href="<?php echo $this->url('audio',  array('action' => 'delete','id' => 'all'));?>"  class="btn btn-danger" role="button"> 
+				Delete All
+			</a>
+		</p>
 	</div>
+
+
+</div>
 
