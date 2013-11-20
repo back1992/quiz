@@ -6,7 +6,7 @@ $this->headTitle($title);
 <?php if(count($flashMessages)) : ?>
 	<ul>
 		<?php foreach ($flashMessages as $msg) : ?>
-			<li><?php echo $msg; ?></li>
+			<li><em><?php echo $msg; ?></em></li>
 		<?php endforeach; ?>
 	</ul>
 <?php endif; ?>

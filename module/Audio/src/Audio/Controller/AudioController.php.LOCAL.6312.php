@@ -11,7 +11,6 @@ use Album\Form\AudioForm;
 use Audio\Form\UploadForm;
 use Audio\Form\UpdateForm;
 use Audio\Form\ViewAudioForm;
-use \Dandan;
 class AudioController extends AbstractActionController
 {
 	public function indexAction()
@@ -27,15 +26,16 @@ class AudioController extends AbstractActionController
 		//get a MongoGridFS instance
 		$gridFS = $mongo->database->getGridFS();
 		$form = new UploadForm('upload-form');
-		// $form->setValidationGroup('title', 'monthyear', 'caption', 'audio-file');
+		$form->setValidationGroup('title', 'monthyear', 'caption', 'audio-file');
 		$request = $this->getRequest();
 		if ($request->isPost()) {
 			// Make certain to merge the files info!
 			$post = array_merge_recursive($request->getPost()->toArray() , $request->getFiles()->toArray());
-			// $post = $request->getPost();
 			$form->setData($post);
+			var_dump($post);
 			if ($form->isValid()) {
 				$data = $form->getData();
+				var_dump($data);
 				$filetype = $data['audio-file']['type'];
 				$title = $data['title'];
 				$monthyear = $post['monthyear'];
@@ -53,10 +53,9 @@ class AudioController extends AbstractActionController
 					'monthyear' => $monthyear,
 				));
 				$flag = 1;
-				
-				return $this->redirect()->toRoute('audio', array(
+				/*				return $this->redirect()->toRoute('audio', array(
 					'action' => 'audioindb'
-				));
+					));*/
 			}
 		}
 		
@@ -66,46 +65,6 @@ class AudioController extends AbstractActionController
 		);
 	}
 	public function updateAction()
-	{
-		ini_set('display_errors', '1');
-		$id = $this->getEvent()->getRouteMatch()->getParam('id');
-		$mongo = DBConnection::instantiate();
-		$gridFS = $mongo->database->getGridFS();
-		$mp3 = $gridFS->findOne(array(
-			'_id' => new MongoId($id)
-		));
-		$form = new UploadForm();
-		$form->setData($mp3->file);
-		$request = $this->getRequest();
-		if ($request->isPost()) {
-			// Make certain to merge the files info!
-			$post = $request->getPost();
-			$form->setData($post);
-			var_dump($post);
-				// var_dump($data);
-				// $filetype = $data['audio-file']['type'];
-				$title = '2222222222222222222';
-				// $title = $post['title'];
-				// $filename = $data['audio-file']['name'];
-				// $mp3file = $tmpfilepath;
-				echo '111111111111111';
-				$gridFS->update(array("_id" => $id), array(
-					// 'audioname' => $filename,
-					'title' => $title,
-				));
-				$flag = 1;
-				
-/*				return $this->redirect()->toRoute('audio', array(
-					'action' => 'audioindb'
-				));*/
-		}
-		
-		return array(
-			'id' => $id,
-			'form' => $form
-		);
-	}
-	public function update2Action()
 	{
 		ini_set('display_errors', '1');
 		$id = $this->getEvent()->getRouteMatch()->getParam('id');
@@ -186,7 +145,7 @@ class AudioController extends AbstractActionController
 		
 		return false;
 	}
-	public function audioeditindbAction()
+	public function audioindbAction()
 	{
 		ini_set('display_errors', '1');
 		$mongo = DBConnection::instantiate();
@@ -211,7 +170,7 @@ class AudioController extends AbstractActionController
 			'flashMessages' => $this->flashMessenger()->getMessages()
 		);
 	}
-	public function audioindbAction()
+	public function audioindb2Action()
 	{
 		ini_set('display_errors', '1');
 		$mongo = DBConnection::instantiate();
@@ -225,6 +184,7 @@ class AudioController extends AbstractActionController
 	}
 	public function fetchaudioAction()
 	{
+		ini_set('display_errors', '1');
 		$id = $this->getEvent()->getRouteMatch()->getParam('id');
 		if (!$id) {
 			$this->flashMessenger()->addMessage('You havn\'t select audio file in database .');
@@ -239,26 +199,24 @@ class AudioController extends AbstractActionController
 		$object = $gridFS->findOne(array(
 			'_id' => new MongoId($id)
 		));
-		$form = new updateForm();
-		$form->setData($object->file);
+		var_dump($object);
+		$formdata = new ArrayObject;
+		$formdata['title'] = $object['title'];
+		//view in form
+		$form = new audioForm();
+		$form->setBindOnValidate(false);
+		$form->bind($formdata);
 		$audiofiledir = './public/audiodata/raw/';
-		$loader = new \Zend\Loader\ClassMapAutoloader();
-		// Register the class map:
-		$loader->registerAutoloadMap('./vendor/dandan/autoload_classmap.php');
-		// Register with spl_autoload:
-		$loader->register();
-		$files =  \Dandan::dirToArray($audiofiledir);
-		krsort($files);
 		$form->setData(array(
 			'audiofiledir' => $audiofiledir
 		));
-		// write to raw directory
-		$audioname = $object->file['audioname'];
+		// var_dump((object)$object->file);
+		//write to raw directory
+		$audioname = $object['audio-file']['audioname'];
 		$object->write($audiofiledir . $audioname);
 		$this->flashMessenger()->addMessage("You have fetch audio file  '$audioname' into  '$audiofiledir' .");
+		
 		return array(
-			'files' => $files, 
-			'dir' => $audiofiledir,
 			'form' => $form,
 			'flashMessages' => $this->flashMessenger()->getMessages()
 		);
@@ -437,16 +395,25 @@ class AudioController extends AbstractActionController
 		$collection = $mongo->getCollection('dandan');
 		// Convert JSON to a PHP array
 		$file = file_get_contents('./public/js/cityselect/city.min.js', FILE_USE_INCLUDE_PATH);
-		var_dump($file);
-		$citylist = json_decode($file);
+		// var_dump($file);
+		// echo $file;
+		$citylist = json_decode($file, true);
+		echo '<pre>';
 		// Loop array and create seperate documents for each tweet
-		
-		foreach ($citylist as $id => $item) {
-			$collection->insert($item);
+		// print_r($citylist);
+	
+		// var_dump($citylist);
+		foreach ($citylist as $key => $values) {
+			foreach ($values as $key1 => $value) {
+				// var_dump($value);
+				 $collection->insert($value);
+			}
+			# code...
 		}
 		// $collection->insert($myjson)
-		
+			echo '</pre>';
 		return false;
+		// return $citylist;
 	}
 	function findValues($byte1, $byte2)
 	{

@@ -13,10 +13,10 @@ class Module
         return array(
          'Zend\Loader\ClassMapAutoloader' => array(
             // File containing class map key/value pairs
-            __DIR__ . '/../../library/autoloader_classmap.php',
+           './vendor/dandan/autoload_classmap.php',
             // Or provide an array with the class map instead...
             array( 
-                'Application\Bootstrap' => __DIR__ . '/application/Bootstrap.php',
+                'Dandan' => './vendor/dandan/library/Dandan/Dandan.php',
                 'CL_Res_Chain_Mutable'  => __DIR__ . '/library/pathhere/Mutable.php',
                 ),
             ),
