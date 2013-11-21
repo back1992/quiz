@@ -51,10 +51,10 @@ class UpdateForm extends Form
                ),
            ));
         $this->add(array(
-            'name' => 'caption',
+            'name' => 'tag',
             'type' => 'Text',
             'options' => array(
-                'label' => 'Caption ',
+                'label' => 'Tag ',
                 ),
             ));
         $this->add(array(

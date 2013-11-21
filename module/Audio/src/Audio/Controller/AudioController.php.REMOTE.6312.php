@@ -25,7 +25,7 @@ class AudioController extends AbstractActionController
 		//get a MongoGridFS instance
 		$gridFS = $mongo->database->getGridFS();
 		$form = new UploadForm('upload-form');
-		$form->setValidationGroup('title', 'monthyear', 'caption', 'audio-file');
+		$form->setValidationGroup('title', 'monthyear', 'tag', 'audio-file');
 		$request = $this->getRequest();
 		if ($request->isPost()) {
 			// Make certain to merge the files info!
@@ -39,7 +39,7 @@ class AudioController extends AbstractActionController
 				$title = $data['title'];
 				$monthyear = $post['monthyear'];
 				$tmpfilepath = $data['audio-file']['tmp_name'];
-				$caption = $data['caption'];
+				$tag = $data['tag'];
 				$filename = $data['audio-file']['name'];
 				$mp3file = $tmpfilepath;
 				$gridFS->storeFile($mp3file, array(
@@ -47,7 +47,7 @@ class AudioController extends AbstractActionController
 					'filetype' => $filetype,
 					'state' => $post['state'],
 					'city' => $post['city'],
-					'caption' => $caption,
+					'tag' => $tag,
 					'title' => $title,
 					'monthyear' => $monthyear,
 					));
@@ -149,7 +149,7 @@ require_once './vendor/dandan/library/Dandan/Dandan.php';
 				$year = $post['monthyear']['year'];
 				$monthyear = array('month' => $post['monthyear']['month'], 'year' => $post['monthyear']['year']);
 				$tmpfilepath = $data['audio-file']['tmp_name'];
-				$caption = $data['caption'];
+				$tag = $data['tag'];
 				$filename = $data['audio-file']['name'];
 				$mp3file = $tmpfilepath;
 				$gridFS->update($mp3file, array(
@@ -157,7 +157,7 @@ require_once './vendor/dandan/library/Dandan/Dandan.php';
 					'filetype' => $filetype,
 					'state' => $post['state'],
 					'city' => $post['city'],
-					'caption' => $caption,
+					'tag' => $tag,
 					'title' => $title,
 					'monthyear' => $monthyear,
 					));

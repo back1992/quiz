@@ -8,8 +8,7 @@ class FfmpegController extends AbstractActionController
 {
 	public function indexAction()
 	{
-		$config = $this->
-getServiceLocator()->get('Config');
+		$config = $this->getServiceLocator()->get('Config');
 		$form = new DirForm();
 		$dir = $config['settings']['audiodata'];
 		if( file_exists($dir) ) {
@@ -51,9 +50,11 @@ getServiceLocator()->get('Config');
 	}
 	public function editAction()
 	{
-				$config = $this->getServiceLocator()->get('Config');
+		$config = $this->getServiceLocator()->get('Config');
+		$dir = $config['settings']['audiodata'];
 		$form = new DirForm();
 		$dir = $config['settings']['audiodata'];
+		$files = $audioFile = '';
 		if( file_exists($dir) ) {
 			$files = $this->dirToArray($dir);
 			krsort($files);
@@ -109,156 +110,155 @@ getServiceLocator()->get('Config');
 		$logArray =  file($logfile);
 		array_splice($logArray,  0, 2);     
 		for ($i=0; $i
-<count($logArray); $i++) {
+			<count($logArray); $i++) {
 			$logArray[$i] = preg_split("/[\s,]+/", $logArray[$i]);
-			array_splice($logArray[$i], 2, 2);
-		}
-		sort ($logArray);
-		$request = $this->
+		array_splice($logArray[$i], 2, 2);
+	}
+	sort ($logArray);
+	$request = $this->
 	getRequest();
-		if ($request->isPost()) {
-			$audioFile=str_replace('./public/', '/', substr($request->getPost()->title, 0, -4));
-			var_dump($audioFile);
-		}
-		return array(
-			'logArray' => $logArray,
-			'audioFile' => $audioFile,
-			);
+	if ($request->isPost()) {
+		$audioFile=str_replace('./public/', '/', substr($request->getPost()->title, 0, -4));
+		var_dump($audioFile);
 	}
-	public function spltAction()
-	{
+	return array(
+		'logArray' => $logArray,
+		'audioFile' => $audioFile,
+		);
+}
+public function spltAction()
+{
 	// Consumes the configuration array
-		$reader = new \Zend\Config\Reader\Json();
-		$data   = $reader->fromFile('./config/autoload/config.json');
-		$form = new DirForm();
-		$request = $this->getRequest();
-		if ($request->isPost()) {
-			var_dump($request->getPost());
-			$audioFile = $request->getPost()->title;
-			$fileInfo = pathinfo($audioFile);
-			$audioSDir =  $fileInfo['dirname'];
-			$audioTDir =  $audioSDir.'/../'.$fileInfo['filename'].'/';
-			var_dump($audioFile);
-			var_dump($fileInfo);
-			var_dump($audioSDir);
-			var_dump($audioTDir);
-			$cmd_splt = " rm -rf $audioTDir* && mp3splt -s  $audioFile  -d $audioTDir  && cp ./mp3splt.log  $audioTDir";
-			var_dump($cmd_splt);
-			// $spltlog = shell_exec($cmd_splt);
+		// $reader = new \Zend\Config\Reader\Json();
+		// $data   = $reader->fromFile('./config/autoload/config.json');
+	$form = new DirForm();
+	$request = $this->getRequest();
+	if ($request->isPost()) {
+			// var_dump($request->getPost());
+		$audioFile = $request->getPost()->audiofiledir.$request->getPost()->audioname;
+			// $fileInfo = pathinfo($audioFile);
+		$audioSDir =  $request->getPost()->audiofiledir;
+		$audioTDir =  $audioSDir.'../'.basename($audioFile, '.mp3').'/';
+			// var_dump($audioFile);
+			// var_dump($audioSDir);
+			// var_dump($audioTDir);
+		$cmd_splt = " rm -rf $audioTDir* && mp3splt -s  $audioFile  -d $audioTDir  && cp ./mp3splt.log  $audioTDir";
+			// var_dump($cmd_splt);
+		$spltlog = shell_exec($cmd_splt);
 			// var_dump($spltlog);
-			if( file_exists($audioTDir) ) {
-				$files = $this->dirToArray($audioTDir);
-				krsort($files);
-			}
-			$resFile = str_replace('.mp3', '', str_replace('./public', '', $audioFile));
-			return array('files' => $files, 'audioFile' => $resFile, 'dir' => $audioTDir, 'form' => $form);
-		}
-		return false;
-	} 
-	public function spltdirAction()
-	{
-	// Consumes the configuration array
-		$reader = new \Zend\Config\Reader\Json();
-		$data   = $reader->fromFile('./data/config.json');
-		// $dir = './public/';
-		$form = new DirForm();
-		$request = $this->getRequest();
-		if ($request->isPost()) {
-			var_dump($request->getPost());
-			$audioFile = $request->getPost()->title;
-			$fileInfo = pathinfo($audioFile);
-			$audioSDir =  $fileInfo['dirname'];
-			$audioTDir =  $audioSDir.'/../'.$fileInfo['filename'].'/';
-			var_dump($audioFile);
-			var_dump($fileInfo);
-			var_dump($audioSDir);
-			var_dump($audioTDir);
-			$cmd_splt = " rm -rf $audioTDir* && mp3splt -s  $audioFile  -d $audioTDir  && cp ./mp3splt.log  $audioTDir";
-			var_dump($cmd_splt);
-			// $spltlog = shell_exec($cmd_splt);
-			// var_dump($spltlog);
-			if( file_exists($audioTDir) ) {
-				$files = $this->dirToArray($audioTDir);
-				krsort($files);
-			}
-			$resFile = str_replace('.mp3', '', str_replace('./public', '', $audioFile));
-			return array('files' => $files, 'audioFile' => $resFile, 'dir' => $audioTDir, 'form' => $form);
-		}
-		return false;
-	} 
-	function rangeAction() {
-		
-	}
-	public function viewAction()
-	{
-        // get the article from the persistence layer, etc...
-		$view = new ViewModel();
-        // this is not needed since it matches "module/controller/action"
-		$view->setTemplate('content/article/view');
-		$article = 'var article';
-		$articleView = new ViewModel(array('article' => $article));
-		$articleView->setTemplate('content/article');
-		$primarySidebarView = new ViewModel();
-		$primarySidebarView->setTemplate('content/main-sidebar');
-		$secondarySidebarView = new ViewModel();
-		$secondarySidebarView->setTemplate('content/secondary-sidebar');
-		$sidebarBlockView = new ViewModel();
-		$sidebarBlockView->setTemplate('content/block');
-		$secondarySidebarView->addChild($sidebarBlockView, 'block');
-		$view->addChild($articleView, 'article')
-		->addChild($primarySidebarView, 'sidebar_primary')
-		->addChild($secondarySidebarView, 'sidebar_secondary');
-		return $view;
-	}
-	public function viewlistAction()
-	{
-        // get the article from the persistence layer, etc...
-		$view = new ViewModel();
-        // this is not needed since it matches "module/controller/action"
-		// $view->setTemplate('content/article/view');
-		$article = 'var article';
-		$articleView = new ViewModel(array('article' => $article));
-		$articleView->setTemplate('content/article');
-		$primarySidebarView = new ViewModel();
-		$primarySidebarView->setTemplate('content/main-sidebar');
-		$config = $this->getServiceLocator()->get('Config');
-		$dir = $config['settings']['audiodata'];
-		if( file_exists($dir) ) {
-			$files = $this->dirToArray($dir);
+		if( file_exists($audioTDir) ) {
+			$files = $this->dirToArray($audioTDir);
 			krsort($files);
 		}
-		// $filelistView = new ViewModel();
-		$filelistView = new ViewModel(array('files' => $files, 'dir' => $dir));
-		$filelistView->setTemplate('audio/filelist');
-		$secondarySidebarView = new ViewModel();
-		$secondarySidebarView->setTemplate('content/secondary-sidebar');
-		$sidebarBlockView = new ViewModel();
-		$sidebarBlockView->setTemplate('content/block');
-		$secondarySidebarView->addChild($sidebarBlockView, 'block');
-		$view->addChild($articleView, 'article')
-		->addChild($primarySidebarView, 'sidebar_primary')
-		->addChild($filelistView, 'filelist')
-		->addChild($secondarySidebarView, 'sidebar_secondary');
-		return $view;
+		$resFile = str_replace('.mp3', '', str_replace('./public', '', $audioFile));
+		return array('files' => $files, 'audioFile' => $resFile, 'dir' => $audioTDir, 'form' => $form);
 	}
-	function dirToArray($dir, $path = false) { 
-		$result = array(); 
-		$cdir = scandir($dir); 
-		foreach ($cdir as $key => $value) 
+	return false;
+} 
+public function spltdirAction()
+{
+	// Consumes the configuration array
+	$reader = new \Zend\Config\Reader\Json();
+	$data   = $reader->fromFile('./data/config.json');
+		// $dir = './public/';
+	$form = new DirForm();
+	$request = $this->getRequest();
+	if ($request->isPost()) {
+		var_dump($request->getPost());
+		$audioFile = $request->getPost()->title;
+		$fileInfo = pathinfo($audioFile);
+		$audioSDir =  $fileInfo['dirname'];
+		$audioTDir =  $audioSDir.'/../'.$fileInfo['filename'].'/';
+		var_dump($audioFile);
+		var_dump($fileInfo);
+		var_dump($audioSDir);
+		var_dump($audioTDir);
+		$cmd_splt = " rm -rf $audioTDir* && mp3splt -s  $audioFile  -d $audioTDir  && cp ./mp3splt.log  $audioTDir";
+		var_dump($cmd_splt);
+			// $spltlog = shell_exec($cmd_splt);
+			// var_dump($spltlog);
+		if( file_exists($audioTDir) ) {
+			$files = $this->dirToArray($audioTDir);
+			krsort($files);
+		}
+		$resFile = str_replace('.mp3', '', str_replace('./public', '', $audioFile));
+		return array('files' => $files, 'audioFile' => $resFile, 'dir' => $audioTDir, 'form' => $form);
+	}
+	return false;
+} 
+function rangeAction() {
+
+}
+public function viewAction()
+{
+        // get the article from the persistence layer, etc...
+	$view = new ViewModel();
+        // this is not needed since it matches "module/controller/action"
+	$view->setTemplate('content/article/view');
+	$article = 'var article';
+	$articleView = new ViewModel(array('article' => $article));
+	$articleView->setTemplate('content/article');
+	$primarySidebarView = new ViewModel();
+	$primarySidebarView->setTemplate('content/main-sidebar');
+	$secondarySidebarView = new ViewModel();
+	$secondarySidebarView->setTemplate('content/secondary-sidebar');
+	$sidebarBlockView = new ViewModel();
+	$sidebarBlockView->setTemplate('content/block');
+	$secondarySidebarView->addChild($sidebarBlockView, 'block');
+	$view->addChild($articleView, 'article')
+	->addChild($primarySidebarView, 'sidebar_primary')
+	->addChild($secondarySidebarView, 'sidebar_secondary');
+	return $view;
+}
+public function viewlistAction()
+{
+        // get the article from the persistence layer, etc...
+	$view = new ViewModel();
+        // this is not needed since it matches "module/controller/action"
+		// $view->setTemplate('content/article/view');
+	$article = 'var article';
+	$articleView = new ViewModel(array('article' => $article));
+	$articleView->setTemplate('content/article');
+	$primarySidebarView = new ViewModel();
+	$primarySidebarView->setTemplate('content/main-sidebar');
+	$config = $this->getServiceLocator()->get('Config');
+	$dir = $config['settings']['audiodata'];
+	if( file_exists($dir) ) {
+		$files = $this->dirToArray($dir);
+		krsort($files);
+	}
+		// $filelistView = new ViewModel();
+	$filelistView = new ViewModel(array('files' => $files, 'dir' => $dir));
+	$filelistView->setTemplate('audio/filelist');
+	$secondarySidebarView = new ViewModel();
+	$secondarySidebarView->setTemplate('content/secondary-sidebar');
+	$sidebarBlockView = new ViewModel();
+	$sidebarBlockView->setTemplate('content/block');
+	$secondarySidebarView->addChild($sidebarBlockView, 'block');
+	$view->addChild($articleView, 'article')
+	->addChild($primarySidebarView, 'sidebar_primary')
+	->addChild($filelistView, 'filelist')
+	->addChild($secondarySidebarView, 'sidebar_secondary');
+	return $view;
+}
+function dirToArray($dir, $path = false) { 
+	$result = array(); 
+	$cdir = scandir($dir); 
+	foreach ($cdir as $key => $value) 
+	{ 
+		if (!in_array($value,array(".",".."))) 
 		{ 
-			if (!in_array($value,array(".",".."))) 
+			if (is_dir($dir . DIRECTORY_SEPARATOR . $value)) 
 			{ 
-				if (is_dir($dir . DIRECTORY_SEPARATOR . $value)) 
-				{ 
-					$result[$value] = $this->dirToArray($dir . DIRECTORY_SEPARATOR . $value); 
-				} 
-				else 
-				{ 
+				$result[$value] = $this->dirToArray($dir . DIRECTORY_SEPARATOR . $value); 
+			} 
+			else 
+			{ 
 					// (!$path) ? $result[] =  $value : $result[] = $dir . DIRECTORY_SEPARATOR . $value; 
-					$result[] =  (!$path) ? $value : $dir . DIRECTORY_SEPARATOR . $value; 
-				} 
+				$result[] =  (!$path) ? $value : $dir . DIRECTORY_SEPARATOR . $value; 
 			} 
 		} 
-		return $result; 
-	}
+	} 
+	return $result; 
+}
 }

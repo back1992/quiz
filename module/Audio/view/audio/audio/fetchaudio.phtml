@@ -11,33 +11,29 @@ $this->headTitle($title);
 	</ul>
 <?php endif; ?>
 <div class="row">
-<div class="col-md-6">
-	<?php
+	<div class="col-md-6">
+		<?php
 		echo $this->
-	partial('partial/filelist.phtml', array(
+		partial('partial/filelist.phtml', array(
 			'files' => $this->files,
 			'dir' => $this->dir
 			)); 
 			?>
-			</div>
-			<div class="col-md-6">
-<?php
-$form->prepare();
-echo $this->form()->openTag($form); 
-echo $this->formRow($form->get('title')); 
-echo $this->formRow($form->get('audiofiledir'));
-echo $this->formRow($form->get('audioname'));
-echo $this->formSubmit($form->get('submit')->setAttribute('class', 'btn btn-primary'));
-?>
+		</div>
+		<div class="col-md-6">
+			<?php
+			$form->prepare();
+			echo $this->form()->openTag($form); 
+			echo $this->formRow($form->get('title')); 
+			echo $this->formRow($form->get('audiofiledir'));
+			echo $this->formRow($form->get('audioname'));
+			echo $this->formSubmit($form->get('submit')->setAttribute('class', 'btn btn-primary')->setValue('Splt'));
+			?>
 
-<p>
-	<a href="<?php echo $this->url('audio',  array('action' => 'audioindb'));?>" class="btn btn-default" role="button"> 
-		List All
-	</a>
-	<span class="help-block">list Audio file in MongoDB?</span>
-</p>
-</div>
-<script type='text/javascript'>
-	$('label').wrap('<div class="form-group"></div>');
-// $('input').addClass('form-group');
-</script>
+<span class="help-block">Splt this  audio by silence?</span>
+			<a href="<?php echo $this->url('audio',  array('action' => 'audioindb'));?>" class="btn btn-default" role="button"> 
+				List All
+			</a>
+			<span class="help-block">list Audio file in MongoDB?</span>
+		</div>
+	</div>

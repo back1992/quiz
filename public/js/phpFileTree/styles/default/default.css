@@ -32,6 +32,10 @@
 		list-style-image: url(images/directory.png);
 	}
 	
+	.pft-directory {
+		list-style-image: url(images/directory.png);
+	}
+	
 	/* Default file */
 	.php-file-tree LI.pft-file { list-style-image: url(images/file.png); }
 	/* Additional file types */

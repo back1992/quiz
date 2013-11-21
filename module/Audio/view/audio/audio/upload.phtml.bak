@@ -30,7 +30,7 @@
          ))); ?>
       </div>
       <?php echo $this->
-       formRow($form->get('caption')); ?>
+       formRow($form->get('tag')); ?>
        <?php echo $this->
         formlabel($form->get('audio-file')); ?>
         <?php $fileElement=$ form->

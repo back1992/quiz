@@ -31,46 +31,46 @@ class UploadForm extends Form
                 ),
             ));
         $this->add(array(
-         'type' => 'Zend\Form\Element\Select',
-         'name' => 'state',
-         'options' => array(
-             'label' => 'State: ',
-             'empty_option' => 'state',
-             'value_options' => array(
-                 ),
-             ),
-         'attributes' => array(
+           'type' => 'Zend\Form\Element\Select',
+           'name' => 'state',
+           'options' => array(
+               'label' => 'State: ',
+               'empty_option' => 'state',
+               'value_options' => array(
+                   ),
+               ),
+           'attributes' => array(
             'class' => 'form-control form-group prov',
             'id'=>"prov" ,
             'style'=>"width: 130px" ,
             ),
-         ));
+           ));
         $this->add(array(
-         'type' => 'Zend\Form\Element\Select',
-         'name' => 'city',
-         'options' => array(
-             'label' => 'City',
-             'empty_option' => 'City',
-             'value_options' => array(
-                 ),
-             ),
-         'attributes' => array(
+           'type' => 'Zend\Form\Element\Select',
+           'name' => 'city',
+           'options' => array(
+               'label' => 'City',
+               'empty_option' => 'City',
+               'value_options' => array(
+                   ),
+               ),
+           'attributes' => array(
             'class' => 'form-control form-group city',
             'id'=>"city" ,
             'style'=>"width: 130px" ,
             ),
-         ));
+           ));
         $this->add(array(
-            'name' => 'caption',
+            'name' => 'tag',
             'type' => 'Text',
             'options' => array(
-                'label' => 'Caption ',
+                'label' => 'Tag ',
                 ),
             'attributes' => array(
                 'class' => 'form-control form-group',
                 'id'=>"exampleInputPassword1" ,
                 'style'=>"width: 500px" ,
-                'placeholder'=> 'Caption '
+                'placeholder'=> 'Tag '
                 ),
             ));
         $this->add(array(
@@ -87,6 +87,32 @@ class UploadForm extends Form
             'options' => array(
                 'label' => 'Select a month and a year',
                 'min_year' => 1986,
+                ),
+            ));
+        $this->add(array(
+            'name' => 'audioname',
+            'type' => 'Text',
+            'options' => array(
+                'label' => 'Audio Name ',
+                ),
+                        'attributes' => array(
+                'class' => 'form-control form-group',
+                'id'=>"quiz-title" ,
+                'style'=>"width: 500px" ,
+                'placeholder'=> 'Quiz Title '
+                ),
+            ));
+        $this->add(array(
+            'name' => 'audiofiledir',
+            'type' => 'Text',
+            'options' => array(
+                'label' => 'Audio Dir ',
+                ),
+                        'attributes' => array(
+                'class' => 'form-control form-group',
+                'id'=>"quiz-title" ,
+                'style'=>"width: 500px" ,
+                'placeholder'=> 'Audio Dir  '
                 ),
             ));
     }

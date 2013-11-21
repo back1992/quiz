@@ -22,7 +22,7 @@ echo $this->formLabel($form->get('title'));
 echo $this->formRow($form->get('title'));
 // echo $this->formRow($form->get('state'));
 // echo $this->formRow($form->get('city'));
-// echo $this->formRow($form->get('caption'));
+// echo $this->formRow($form->get('tag'));
 echo $this->formRow($form->get('audiofiledir'));
 echo $this->formRow($form->get('audiofiledir'));
 echo $this->formRow($form->get('audioname'));

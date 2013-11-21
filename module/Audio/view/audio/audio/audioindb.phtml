@@ -1,7 +1,5 @@
 <?php
 // module/Album/view/album/album/index.phtml:
-ini_set('display_errors', '1');
-
 $title = 'My Blogs';
 $this->headTitle($title);
 ?>
@@ -27,11 +25,12 @@ $this->headTitle($title);
 					<th width="*">Title</th>
 					<th width="*">Filename</th>
 					<th width="*">Size</th>
+					<th width="*">Tag</th>
 					<th width="*">Action</th>
 				</tr>
 			</thead>
 			<tbody>
-					<?php $i = 1; ?>
+				<?php $i = 1; ?>
 				<?php while($object = $objects->getNext()): ?> 
 					<tr>
 						<td>
@@ -55,6 +54,9 @@ $this->headTitle($title);
 						<td >
 							<?php echo ceil($object->file['length'] /
 							1024).' KB';?>
+						</td>
+						<td>
+							<?php echo $object->file['tag'];?>
 						</td>
 						<td>
 							<a href="<?php echo $this->url('audio',  array('action' => 'fetchaudio','id'
