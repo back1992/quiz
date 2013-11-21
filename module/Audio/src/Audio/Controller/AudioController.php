@@ -109,13 +109,23 @@ class AudioController extends AbstractActionController
 	}
 	public function scanAction()
 	{
-		$audioDir = './public/audiodata/shandong';
-		$audioArray = scandir($audioDir);
-		array_splice($audioArray, 0, 3);
+		// $audioDir = './public/audiodata/shandong';
+		// $audioArray = scandir($audioDir);
+		// array_splice($audioArray, 0, 3);
 		// var_dump($audioArray);
-		
+				$config = $this->getServiceLocator()->get('Config');
+		$dir = $config['settings']['audiodata'];
+			$request = $this->getRequest();
+		if ($request->isPost()) {
+			var_dump($request->getPost());
+			$audioDir = $dir.$request->getPost()->title;
+			var_dump($audioDir);
+				$audioArray = scandir($audioDir);
+		array_splice($audioArray, 0, 3);
+		var_dump($audioArray);
+		}
 		foreach ($audioArray as $audioFile) {
-			$tempArr[] = '/audiodata/shandong/' . substr($audioFile, 0, -4);
+			$tempArr[] = '/audiodata/nanjing/' . substr($audioFile, 0, -4);
 		}
 		$audioRes = array_unique($tempArr);
 		// var_dump($tempArr);
