@@ -89,9 +89,10 @@ class AudioController extends AbstractActionController
 				// $filename = $data['audio-file']['name'];
 				// $mp3file = $tmpfilepath;
 				echo '111111111111111';
-				$gridFS->update(array("_id" => $id), array(
-					// 'audioname' => $filename,
-					'title' => $title,
+				// $gridFS->update(array("_id" => $id), array(
+				$gridFS->update(array("audioname" => "shandong.mp3"), array(
+					'$set' => array(
+					'title' => $title,)
 				));
 				$flag = 1;
 				
